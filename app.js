@@ -2,14 +2,19 @@
 
 const express = require('express');
 const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io').listen(server);
+const ent = require('ent');
 const mongoose = require('mongoose');
 const UserModel = require("./models/user.model.js");
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const routes = require('./routes');
 const passport = require('passport');
+
 const passportStrategies = require('./modules/passportStrategies')(passport);
-const PORT = 4000;
+const SERVER_PORT = 4000;
+const SOCKET_PORT = 4001;
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -48,7 +53,31 @@ process.on('uncaughtException', (err) => {
 });
 
 /*
- * Listen on wanted port
+ * Implement socket for chat-rooms
  */
-app.listen(PORT);
+/// only for testing with index.html
+app.use(express.static(__dirname));
+
+io.sockets.on('connection', function (socket, pseudo) {
+    // Dès qu'on nous donne un pseudo, on le stocke en variable de session et on informe les autres personnes
+    socket.on('nouveau_client', function(pseudo) {
+        console.log('new client : ' + pseudo)
+        pseudo = ent.encode(pseudo);
+        socket.pseudo = pseudo;
+        socket.broadcast.emit('nouveau_client', pseudo);
+    });
+
+    // Dès qu'on reçoit un message, on récupère le pseudo de son auteur et on le transmet aux autres personnes
+    socket.on('message', function (message) {
+        console.log('new message : ' + message)
+        message = ent.encode(message);
+        socket.broadcast.emit('message', {pseudo: socket.pseudo, message: message});
+    }); 
+});
+
+/*
+ * Listen on wanted port for socket server / express server
+ */
+server.listen(SOCKET_PORT);
+app.listen(SERVER_PORT);
 console.log('running on port ' + PORT);
