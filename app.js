@@ -80,4 +80,3 @@ io.sockets.on('connection', function (socket, pseudo) {
  */
 server.listen(SOCKET_PORT);
 app.listen(SERVER_PORT);
-console.log('running on port ' + PORT);
