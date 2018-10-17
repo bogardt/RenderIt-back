@@ -3,23 +3,12 @@ services:
   webapi:
     container_name: webapi
     restart: always
-    build: ./webapi
+    build: ./
     ports:
       - "4000:4000"
     volumes:
-      - ./webapi:/usr/src/webapi
+      - ./:/usr/src/webapi
     network_mode: host
-
-  website:
-    container_name: website
-    restart: always
-    build: ./website
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./website:/usr/src/website
-    network_mode: host
-
 
   mongo:
     container_name: mongo
