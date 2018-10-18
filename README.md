@@ -1,3 +1,7 @@
+# Render it
+
+School project
+
 1) Build the stack
 ```bash
 docker-compose build --no-cache
@@ -7,6 +11,10 @@ docker-compose build --no-cache
 ```bash
 docker-compose up
 ```
+
+# Don't forget to
+- If you're using VSCode make sure Prettier formats on save. Insert "editor.formatOnSave": true into your User Settings in VSCode.
+
 
 # Utils
 
@@ -20,8 +28,4 @@ docker-compose down
 sudo rm -rf mongo_data
 ```
 
-# Webapi
-Api is on port 4000
-
-# Website
-Webapp is on port 3000
+this api run on port 4000
