@@ -10,6 +10,6 @@ router.route('/').post(userController.register);
 
 router.route('/login').post(userController.login);
 // router.route('/logout').post(userController.logout);
-router.route('/me').post(userController.me);
+router.route('/me').get(userController.me);
 
 export default router;

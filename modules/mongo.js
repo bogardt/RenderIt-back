@@ -7,9 +7,9 @@ Mongoose.Promise = global.Promise;
 const connectToMongo = async () => {
   try {
     await Mongoose.connect(`mongodb://${config.dbHost}:${config.dbPort}/${config.dbName}`);
-    logger.info('Connected to mongo!!!');
+    logger.info('MongoDB connect [OK]');
   } catch (err) {
-    logger.error('Could not connect to MongoDB');
+    logger.error('MongoDB connect [NOK]');
   }
 };
 

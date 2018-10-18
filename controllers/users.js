@@ -1,5 +1,6 @@
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import User from '../models/users';
 import logger from '../modules/winston';
 import config from '../config.dev';
@@ -39,19 +40,17 @@ controller.register = async (req, res) => {
  * @param {*} res
  */
 controller.login = async (req, res) => {
-  passport.authenticate('local-login', { session: false }, (err, user) => {
+  const user = await User.findOne({ username: req.body.username });
+  bcrypt.compare(req.body.password, user.password, (err, success) => {
     if (err) {
-      return res.status(500).send({ message: 'Internal server error', errorInfo: err });
+      return res.status(200).send({ message: 'Internal error server', errInfo: err });
     }
-    if (!user) {
-      return res.status(401).send({
-        statusCode: 401,
-        message: 'Unauthorized'
-      });
+    if (success === true) {
+      const token = jwt.sign({ username: user.username }, config.secretJWT);
+      return res.status(200).send({ message: 'success', bearer: token });
     }
-    const token = jwt.sign({ username: user.username }, config.secretJWT);
-    return res.status(200).send({ authToken: token });
-  })(req, res);
+    return res.status(200).send({ message: 'Wrong username or wrong password' });
+  });
 };
 
 /**

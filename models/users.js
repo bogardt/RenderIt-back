@@ -10,11 +10,13 @@ const UserSchema = mongoose.Schema(
     },
     email: {
       type: String,
-      require: true
+      require: true,
+      unique: true
     },
     username: {
       type: String,
-      require: true
+      require: true,
+      unique: true
     },
     password: {
       type: String,
@@ -22,15 +24,16 @@ const UserSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      require: true
-    }
+      require: true,
+      enum: ['user', 'admin'],
+      default: 'user'
+    },
+    createdAt: { type: Date, default: Date.now }
   },
   { collection: 'User' }
 );
 
-const UserModel = mongoose.model('User', UserSchema);
-
-UserSchema.pre('save', next => {
+UserSchema.pre('save', function(next) {
   const user = this;
   bcrypt.genSalt(10, (err, salt) => {
     if (err) return;
@@ -42,6 +45,6 @@ UserSchema.pre('save', next => {
   });
 });
 
-export default UserModel;
+const UserModel = mongoose.model('User', UserSchema);
 
-// module.exports = mongoose.model('User', UserModel);
+export default UserModel;
