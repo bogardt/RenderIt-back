@@ -1,6 +1,6 @@
 # Render it - Apis
 
-A swagger documentation is reacheable on
+A swagger documentation is reacheable on http://localhost:4000/docs
 
 School project
 
