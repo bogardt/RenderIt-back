@@ -5,7 +5,11 @@ import User from '../models/users';
 import logger from '../modules/winston';
 import config from '../config.dev';
 
+const jwtStrategry = require('../modules/passport');
+
 const controller = {};
+
+passport.use(jwtStrategry);
 
 /**
  * Route('/api/users')
@@ -17,7 +21,7 @@ controller.register = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
     if (user) {
-      return res.status(400).send({ success: false, message: 'User already exists in database' });
+      return res.status(400).send({ message: 'User already exists' });
     }
     const newUser = new User();
     newUser.username = req.body.username;
@@ -40,17 +44,22 @@ controller.register = async (req, res) => {
  * @param {*} res
  */
 controller.login = async (req, res) => {
-  const user = await User.findOne({ username: req.body.username });
-  bcrypt.compare(req.body.password, user.password, (err, success) => {
-    if (err) {
-      return res.status(200).send({ message: 'Internal error server', errInfo: err });
-    }
-    if (success === true) {
-      const token = jwt.sign({ username: user.username }, config.secretJWT);
-      return res.status(200).send({ message: 'success', bearer: token });
-    }
-    return res.status(200).send({ message: 'Wrong username or wrong password' });
-  });
+  try {
+    const user = await User.findOne({ username: req.body.username });
+    bcrypt.compare(req.body.password, user.password, (err, success) => {
+      if (err) {
+        return res.status(200).send({ message: 'Internal error server', errInfo: err });
+      }
+      if (success === true) {
+        const token = jwt.sign({ username: user.username }, config.secretJWT);
+        return res.status(200).send({ bearer: token });
+      }
+      return res.status(404).send({ message: 'Wrong username or wrong password' });
+    });
+  } catch (err) {
+    logger.error(`Error in register user- ${err}`);
+    return res.status(500).send({ message: `Error in register user- ${err}` });
+  }
 };
 
 /**
@@ -60,23 +69,24 @@ controller.login = async (req, res) => {
  * @param {*} res
  */
 controller.me = async (req, res) => {
-  passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err) {
-      return res.status(500).send({ message: 'Internal server error', errorInfo: err });
-    }
-    if (!user) {
-      return res.status(401).send({
-        statusCode: 401,
-        message: 'Unauthorized'
+  try {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
+      return res.status(200).send({
+        username: user.username,
+        email: user.email,
+        role: user.role
       });
-    }
-    return res.status(200).send({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      username: user.username
-    });
-  })(req, res);
+    })(req, res);
+  } catch (err) {
+    logger.error(`Error in register user- ${err}`);
+    return res.status(500).send(err);
+  }
 };
 
 export default controller;
