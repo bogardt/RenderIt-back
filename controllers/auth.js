@@ -19,7 +19,7 @@ passport.use(jwtStrategry);
  */
 controller.login = async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.body.username });
+    const user = await User.findOne({ email: req.body.email });
     if (!user) {
       return res.status(401).send({ message: 'Unauthorized' });
     }
@@ -28,7 +28,7 @@ controller.login = async (req, res) => {
         return res.status(200).send({ message: 'Internal error server', errInfo: err });
       }
       if (success === true) {
-        const token = jwt.sign({ username: user.username }, config.secretJWT);
+        const token = jwt.sign({ email: user.email }, config.secretJWT);
         return res.status(200).send({ bearer: token });
       }
       return res.status(404).send({ message: 'Wrong username or wrong password' });

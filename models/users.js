@@ -16,7 +16,6 @@ const UserSchema = mongoose.Schema(
     username: {
       type: String,
       require: true,
-      unique: true
     },
     password: {
       type: String,
@@ -33,7 +32,7 @@ const UserSchema = mongoose.Schema(
   { collection: 'User' }
 );
 
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function (next) {
   const user = this;
   bcrypt.genSalt(10, (err, salt) => {
     if (err) return;

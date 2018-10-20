@@ -151,6 +151,14 @@
                 "username": {
                     "type": "string",
                     "default": "username"
+                },
+                "role": {
+                    "type": "string",
+                    "default": "admin",
+                    "enum": [
+                        "admin",
+                        "user"
+                    ]
                 }
             }
         }
