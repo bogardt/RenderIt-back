@@ -1,4 +1,6 @@
-# Render it
+# Render it - Apis
+
+A swagger documentation is reacheable on
 
 School project
 
@@ -12,8 +14,13 @@ docker-compose build --no-cache
 docker-compose up
 ```
 
+3) As a deamon
+```
+docker-compose up -d
+```
+
 # Don't forget to
-- If you're using VSCode make sure Prettier formats on save. Insert "editor.formatOnSave": true into your User Settings in VSCode.
+If you're using VSCode make sure Prettier formats on save. Insert "editor.formatOnSave": true into your user settings.
 
 
 # Utils
@@ -23,9 +30,9 @@ docker-compose up
 docker-compose down
 ```
 
-#### Delete databases
+#### Delete database
 ```bash
 sudo rm -rf mongo_data
 ```
 
-this api run on port 4000
+this api run on port 3000

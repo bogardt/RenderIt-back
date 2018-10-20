@@ -12,7 +12,7 @@ const controller = {};
 passport.use(jwtStrategry);
 
 /**
- * Route('/api/users')
+ * Route('/api/users/register')
  * POST
  * @param {*} req
  * @param {*} res
