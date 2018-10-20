@@ -20,6 +20,9 @@ passport.use(jwtStrategry);
 controller.login = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
+    if (!user) {
+      return res.status(401).send({ message: 'Unauthorized' });
+    }
     bcrypt.compare(req.body.password, user.password, (err, success) => {
       if (err) {
         return res.status(200).send({ message: 'Internal error server', errInfo: err });
