@@ -1,0 +1,158 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Render-it Apis",
+        "description": "Api for a slack like.",
+        "version": "1.0"
+    },
+    "produces": [
+        "application/json"
+    ],
+    "host": "localhost:4000",
+    "basePath": "/api",
+    "paths": {
+        "/api/users": {
+            "post": {
+                "summary": "register",
+                "operationId": "register",
+                "tags": [
+                    "/register"
+                ],
+                "description": "Register a new user to our website",
+                "parameters": [
+                    {
+                        "name": "register",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Register"
+                        }
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "Invalid request."
+                    },
+                    "201": {
+                        "description": "Successful request."
+                    },
+                    "409": {
+                        "description": "Conflict email already in use."
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "summary": "login",
+                "operationId": "login",
+                "tags": [
+                    "/auth/login"
+                ],
+                "description": "Login to our website.",
+                "parameters": [
+                    {
+                        "name": "login",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "Invalid request."
+                    },
+                    "200": {
+                        "description": "Successful request."
+                    },
+                    "409": {
+                        "description": "Conflict email already in use."
+                    }
+                }
+            }
+        },
+        "/api/auth/me": {
+            "get": {
+                "operationId": "me",
+                "tags": [
+                    "/auth/me"
+                ],
+                "description": "Get information by bearer token",
+                "parameters": [
+                    {
+                        "name": "bearer",
+                        "in": "header",
+                        "description": "JWT",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful request.",
+                        "schema": {
+                            "$ref": "#/definitions/Me"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Register": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "default": "test@test.org"
+                },
+                "username": {
+                    "type": "string",
+                    "default": "usernmae"
+                },
+                "password": {
+                    "type": "string",
+                    "default": "password"
+                }
+            },
+            "required": [
+                "email",
+                "username",
+                "password"
+            ]
+        },
+        "Login": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "default": "test@test.org"
+                },
+                "password": {
+                    "type": "string",
+                    "default": "password"
+                }
+            },
+            "required": [
+                "email",
+                "password"
+            ]
+        },
+        "Me": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "default": "test@test.org"
+                },
+                "username": {
+                    "type": "string",
+                    "default": "username"
+                }
+            }
+        }
+    }
+}

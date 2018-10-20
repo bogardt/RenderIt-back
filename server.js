@@ -8,6 +8,7 @@ import config from './config.dev';
 import logger from './modules/winston';
 import connectToMongo from './modules/mongo';
 import users from './routes/users';
+import auth from './routes/auth';
 
 require('./modules/passport');
 
@@ -67,6 +68,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, middleware => {
   app.use(passport.initialize());
 
   app.use('/api/users', users);
+  app.use('/api/auth', auth);
 
   app.get('/', (req, res) => {
     res.send('Invalid endpoint!');
