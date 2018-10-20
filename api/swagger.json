@@ -13,10 +13,10 @@
     "paths": {
         "/api/users": {
             "post": {
-                "summary": "register",
                 "operationId": "register",
+                "summary": "Register to webiste",
                 "tags": [
-                    "/register"
+                    "Register"
                 ],
                 "description": "Register a new user to our website",
                 "parameters": [
@@ -43,10 +43,10 @@
         },
         "/api/auth/login": {
             "post": {
-                "summary": "login",
                 "operationId": "login",
+                "summary": "Login to website",
                 "tags": [
-                    "/auth/login"
+                    "Login"
                 ],
                 "description": "Login to our website.",
                 "parameters": [
@@ -74,8 +74,9 @@
         "/api/auth/me": {
             "get": {
                 "operationId": "me",
+                "summary": "Get personal data",
                 "tags": [
-                    "/auth/me"
+                    "Me"
                 ],
                 "description": "Get information by bearer token",
                 "parameters": [
