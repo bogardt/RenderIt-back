@@ -11,6 +11,11 @@ var RoomModel = new Schema({
       type: Array,
       of: String,
       require: true
+  },
+  history: {
+    type: Array,
+    of: String,
+    require: false
   }
 });
 
