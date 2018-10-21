@@ -91,10 +91,10 @@ controller.leaveRoom = async (req, res, id) => {
             if ((roomIndex = room.users.indexOf(user.email)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in room' }); }
             if ((userIndex = user.rooms.indexOf(room.name)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in room' }); }
 
-            room.users.pop(roomIndex);
+            room.users.splice(roomIndex, 1);
             await room.save();
 
-            user.room.pop(userIndex);
+            user.rooms.splice(userIndex, 1);
             await user.save();
 
             return res.status(201).send({ message: 'Success' });

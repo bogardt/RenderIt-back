@@ -22,14 +22,18 @@ const UserSchema = mongoose.Schema(
       require: true
     },
     rooms: {
-      type:Array,
-      of:String,
-      require:false
+      type: Array,
+      of: String,
+      require: false
     },
     friends: {
-      type:Array,
-      of:String,
-      require:false
+      type: Array,
+      of: String,
+      require: false
+    },
+    description: {
+      type: String,
+      require: false
     },
     role: {
       type: String,
