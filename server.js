@@ -23,6 +23,11 @@ logger.stream = {
 connectToMongo();
 
 const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+const chat = require('./modules/chat.js');
+
+chat.start(io);
 
 /**
  * swaggerRouter configuration
@@ -75,7 +80,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, middleware => {
   });
 
   // Start the server
-  app.listen(port, () => {
+  server.listen(port, () => {
     logger.info('server started - ', port);
   });
 });
