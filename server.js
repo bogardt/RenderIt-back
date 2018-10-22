@@ -78,7 +78,6 @@ swaggerTools.initializeMiddleware(swaggerDoc, middleware => {
   app.use('/api/users', users);
   app.use('/api/auth', auth);
   app.use('/api/room', room);
-  app.use('/api/friends', friends);
 
   app.get('/', (req, res) => {
     res.send('Invalid endpoint!');
