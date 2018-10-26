@@ -46,11 +46,11 @@ controller.addFriend = async (req, res) => {
           if (err) { return res.status(500).send(err); }
           if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
 
-          const friend = await User.findOne({ email: req.body.user.email });
+          const friend = User.findOne({ email: req.body.user.email });
           if (!friend) { return res.status(409).send({ message: 'User does not exist' }); }
 
           user.friends.push(friend.email);
-          await user.save();
+          user.save();
 
           return res.status(201).send({ message: 'friend successfully added' });
       });
@@ -72,13 +72,13 @@ controller.removeFriend = async (req, res) => {
           if (err) { return res.status(500).send(err); }
           if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
 
-          const friend = await User.findOne({ email: req.body.user.email });
+          const friend = User.findOne({ email: req.body.user.email });
           if (!friend) { return res.status(409).send({ message: 'User does not exist' }); }
 
           if ((userIndex = user.friends.indexOf(friend.email)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in friends list' }); }
 
           user.friends.splice(userIndex, 1);
-          await user.save();
+          user.save();
 
           return res.status(201).send({ message: 'Success' });
       });
@@ -100,7 +100,7 @@ controller.getFriendProfile = async (req, res) => {
           if (err) { return res.status(500).send(err); }
           if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
 
-          const friend = await User.findOne({ email: req.body.user.email });
+          const friend = User.findOne({ email: req.body.user.email });
           if (!friend) { return res.status(409).send({ message: 'User does not exist' }); }
 
           return res.status(201).send([ message => 'Success', name => friend.name, email => user.email, username => user.username,

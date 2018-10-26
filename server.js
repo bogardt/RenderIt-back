@@ -10,7 +10,6 @@ import connectToMongo from './modules/mongo';
 import users from './routes/users';
 import auth from './routes/auth';
 import room from './routes/room';
-import friends from './routes/friends';
 
 require('./modules/passport');
 
