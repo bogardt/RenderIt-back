@@ -16,25 +16,29 @@ passport.use(jwtStrategry);
  * @param {*} res
  */
 controller.createRoom = async (req, res) => {
-    try {
-        passport.authenticate('jwt', { session: false }, (err, user) => {
-            if (err) { return res.status(500).send(err); }
-            if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
-
-            newRoom = new Room();
-            newRoom.name = req.body.name;
-            newRoom.users.push(user.email);
-            newRoom.save();
-
-            user.rooms.push(newRoom.name);
-            user.save();
-
-            return res.status(201).send({ message: 'Room successfully created' });
-        });
-      } catch (err) {
-        logger.error(`Error- ${err}`);
-        return res.status(500).send({ message: `Error- ${err}` });
+  try {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
       }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
+
+      const newRoom = new Room();
+      newRoom.name = req.body.name;
+      newRoom.users.push(user.email);
+      newRoom.save();
+
+      user.rooms.push(newRoom.name);
+      user.save();
+
+      return res.status(201).send({ message: 'Room successfully created' });
+    });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
 };
 
 /**
@@ -43,9 +47,7 @@ controller.createRoom = async (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-controller.deleteRoom = async (req, res, id) => {
-
-};
+controller.deleteRoom = async (req, res, id) => {};
 
 /**
  * Route('/api/room/:id')
@@ -54,23 +56,43 @@ controller.deleteRoom = async (req, res, id) => {
  * @param {*} res
  */
 controller.getRoom = async (req, res, id) => {
-    try {
-        passport.authenticate('jwt', { session: false }, (err, user) => {
-            if (err) { return res.status(500).send(err); }
-            if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
+  try {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
 
-            const room = Room.findOne({ name: id });
-            if (!room) { return res.status(409).send({ message: 'Room does not exist' }); }
+      const room = Room.findOne({ name: id });
+      if (!room) {
+        return res.status(409).send({ message: 'Room does not exist' });
+      }
 
-            if ((roomIndex = room.users.indexOf(user.email)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in room' }); }
-            if ((userIndex = user.rooms.indexOf(room.name)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in room' }); }
+      const roomIndex = room.users.indexOf(user.email);
+      if (roomIndex === -1) {
+        return res.status(401).send({ message: 'Unauthorized : user not in room' });
+      }
 
-            return res.status(201).send([ message => 'Success', name => room.name, history => room.history, users => room.users ]);
-        });
-    } catch (err) {
-        logger.error(`Error- ${err}`);
-        return res.status(500).send({ message: `Error- ${err}` });
-    }
+      const userIndex = user.rooms.indexOf(room.name);
+      if (userIndex === -1) {
+        return res.status(401).send({ message: 'Unauthorized : user not in room' });
+      }
+
+      return res
+        .status(201)
+        .send([
+          message => 'Success',
+          name => room.name,
+          history => room.history,
+          users => room.users
+        ]);
+    });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
 };
 
 /**
@@ -80,29 +102,42 @@ controller.getRoom = async (req, res, id) => {
  * @param {*} res
  */
 controller.leaveRoom = async (req, res, id) => {
-    try {
-        passport.authenticate('jwt', { session: false }, (err, user) => {
-            if (err) { return res.status(500).send(err); }
-            if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
+  try {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
 
-            const room = Room.findOne({ name: id });
-            if (!room) { return res.status(409).send({ message: 'Room does not exist' }); }
+      const room = Room.findOne({ name: id });
+      if (!room) {
+        return res.status(409).send({ message: 'Room does not exist' });
+      }
 
-            if ((roomIndex = room.users.indexOf(user.email)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in room' }); }
-            if ((userIndex = user.rooms.indexOf(room.name)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in room' }); }
+      const roomIndex = room.users.indexOf(user.email);
+      if (roomIndex == -1) {
+        return res.status(401).send({ message: 'Unauthorized : user not in room' });
+      }
 
-            room.users.splice(roomIndex, 1);
-            room.save();
+      const userIndex = user.rooms.indexOf(room.name);
+      if (userIndex === -1) {
+        return res.status(401).send({ message: 'Unauthorized : user not in room' });
+      }
 
-            user.rooms.splice(userIndex, 1);
-            user.save();
+      room.users.splice(roomIndex, 1);
+      room.save();
 
-            return res.status(201).send({ message: 'Success' });
-        });
-    } catch (err) {
-        logger.error(`Error- ${err}`);
-        return res.status(500).send({ message: `Error- ${err}` });
-    }
+      user.rooms.splice(userIndex, 1);
+      user.save();
+
+      return res.status(201).send({ message: 'Success' });
+    });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
 };
 
 /**
@@ -112,29 +147,36 @@ controller.leaveRoom = async (req, res, id) => {
  * @param {*} res
  */
 controller.joinRoom = async (req, res, id, userId) => {
-    try {
-        passport.authenticate('jwt', { session: false }, (err, user) => {
-            if (err) { return res.status(500).send(err); }
-            if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
+  try {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
 
-            const room = Room.findOne({ name: id });
-            const newUser = User.findOne({email: userId});
-            if (!newUser) { return res.status(409).send({ message: 'User does not exist' }); }
-            if (!room) { return res.status(409).send({ message: 'Room does not exist' }); }
+      const room = Room.findOne({ name: id });
+      const newUser = User.findOne({ email: userId });
+      if (!newUser) {
+        return res.status(409).send({ message: 'User does not exist' });
+      }
+      if (!room) {
+        return res.status(409).send({ message: 'Room does not exist' });
+      }
 
-            room.users.push(newUser.email);
-            room.save();
+      room.users.push(newUser.email);
+      room.save();
 
-            newUser.rooms.push(room.name);
-            newUser.save();
+      newUser.rooms.push(room.name);
+      newUser.save();
 
-            return res.status(201).send({ message: 'User successfully added' });
-        });
-
-    } catch (err) {
-        logger.error(`Error- ${err}`);
-        return res.status(500).send({ message: `Error- ${err}` });
-    }
+      return res.status(201).send({ message: 'User successfully added' });
+    });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
 };
 
 export default controller;

@@ -42,22 +42,28 @@ controller.register = async (req, res) => {
  */
 controller.addFriend = async (req, res) => {
   try {
-      passport.authenticate('jwt', { session: false }, (err, user) => {
-          if (err) { return res.status(500).send(err); }
-          if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
 
-          const friend = User.findOne({ email: req.body.user.email });
-          if (!friend) { return res.status(409).send({ message: 'User does not exist' }); }
+      const friend = User.findOne({ email: req.body.user.email });
+      if (!friend) {
+        return res.status(409).send({ message: 'User does not exist' });
+      }
 
-          user.friends.push(friend.email);
-          user.save();
+      user.friends.push(friend.email);
+      user.save();
 
-          return res.status(201).send({ message: 'friend successfully added' });
-      });
-    } catch (err) {
-      logger.error(`Error- ${err}`);
-      return res.status(500).send({ message: `Error- ${err}` });
-    }
+      return res.status(201).send({ message: 'friend successfully added' });
+    });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
 };
 
 /**
@@ -66,50 +72,71 @@ controller.addFriend = async (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-controller.removeFriend = async (req, res) => { 
+controller.removeFriend = async (req, res) => {
   try {
-      passport.authenticate('jwt', { session: false }, (err, user) => {
-          if (err) { return res.status(500).send(err); }
-          if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
 
-          const friend = User.findOne({ email: req.body.user.email });
-          if (!friend) { return res.status(409).send({ message: 'User does not exist' }); }
+      const friend = User.findOne({ email: req.body.user.email });
+      if (!friend) {
+        return res.status(409).send({ message: 'User does not exist' });
+      }
 
-          if ((userIndex = user.friends.indexOf(friend.email)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in friends list' }); }
+      const userIndex = user.friends.indexOf(friend.email);
+      if (userIndex === -1) {
+        return res.status(401).send({ message: 'Unauthorized : user not in friends list' });
+      }
 
-          user.friends.splice(userIndex, 1);
-          user.save();
+      user.friends.splice(userIndex, 1);
+      user.save();
 
-          return res.status(201).send({ message: 'Success' });
-      });
-    } catch (err) {
-      logger.error(`Error- ${err}`);
-      return res.status(500).send({ message: `Error- ${err}` });
-    }
+      return res.status(201).send({ message: 'Success' });
+    });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
 };
 
 /**
-* Route('/api/users/friends/:id')
-* GET
-* @param {*} req
-* @param {*} res
-*/
+ * Route('/api/users/friends/:id')
+ * GET
+ * @param {*} req
+ * @param {*} res
+ */
 controller.getFriendProfile = async (req, res) => {
   try {
-      passport.authenticate('jwt', { session: false }, (err, user) => {
-          if (err) { return res.status(500).send(err); }
-          if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
 
-          const friend = User.findOne({ email: req.body.user.email });
-          if (!friend) { return res.status(409).send({ message: 'User does not exist' }); }
+      const friend = User.findOne({ email: req.body.user.email });
+      if (!friend) {
+        return res.status(409).send({ message: 'User does not exist' });
+      }
 
-          return res.status(201).send([ message => 'Success', name => friend.name, email => user.email, username => user.username,
-                                       description => user.description]);
-      });
-    } catch (err) {
-      logger.error(`Error- ${err}`);
-      return res.status(500).send({ message: `Error- ${err}` });
-    }
+      return res
+        .status(201)
+        .send([
+          message => 'Success',
+          name => friend.name,
+          email => user.email,
+          username => user.username,
+          description => user.description]);
+    });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
 };
 
 export default controller;
