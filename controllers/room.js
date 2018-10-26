@@ -24,10 +24,10 @@ controller.createRoom = async (req, res) => {
             newRoom = new Room();
             newRoom.name = req.body.name;
             newRoom.users.push(user.email);
-            await newRoom.save();
+            newRoom.save();
 
             user.rooms.push(newRoom.name);
-            await user.save();
+            user.save();
 
             return res.status(201).send({ message: 'Room successfully created' });
         });
@@ -59,7 +59,7 @@ controller.getRoom = async (req, res, id) => {
             if (err) { return res.status(500).send(err); }
             if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
 
-            const room = await Room.findOne({ name: id });
+            const room = Room.findOne({ name: id });
             if (!room) { return res.status(409).send({ message: 'Room does not exist' }); }
 
             if ((roomIndex = room.users.indexOf(user.email)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in room' }); }
@@ -85,17 +85,17 @@ controller.leaveRoom = async (req, res, id) => {
             if (err) { return res.status(500).send(err); }
             if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
 
-            const room = await Room.findOne({ name: id });
+            const room = Room.findOne({ name: id });
             if (!room) { return res.status(409).send({ message: 'Room does not exist' }); }
 
             if ((roomIndex = room.users.indexOf(user.email)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in room' }); }
             if ((userIndex = user.rooms.indexOf(room.name)) == -1) { return res.status(401).send({ message: 'Unauthorized : user not in room' }); }
 
             room.users.splice(roomIndex, 1);
-            await room.save();
+            room.save();
 
             user.rooms.splice(userIndex, 1);
-            await user.save();
+            user.save();
 
             return res.status(201).send({ message: 'Success' });
         });
@@ -117,16 +117,16 @@ controller.joinRoom = async (req, res, id, userId) => {
             if (err) { return res.status(500).send(err); }
             if (!user) { return res.status(401).send({ message: 'Unauthorized' }); }
 
-            const room = await Room.findOne({ name: id });
-            const newUser = await User.findOne({email: userId});
+            const room = Room.findOne({ name: id });
+            const newUser = User.findOne({email: userId});
             if (!newUser) { return res.status(409).send({ message: 'User does not exist' }); }
             if (!room) { return res.status(409).send({ message: 'Room does not exist' }); }
 
             room.users.push(newUser.email);
-            await room.save();
+            room.save();
 
             newUser.rooms.push(room.name);
-            await newUser.save();
+            newUser.save();
 
             return res.status(201).send({ message: 'User successfully added' });
         });
