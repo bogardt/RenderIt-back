@@ -9,6 +9,8 @@ import logger from './modules/winston';
 import connectToMongo from './modules/mongo';
 import users from './routes/users';
 import auth from './routes/auth';
+import room from './routes/room';
+import friends from './routes/friends';
 
 require('./modules/passport');
 
@@ -70,10 +72,12 @@ swaggerTools.initializeMiddleware(swaggerDoc, middleware => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(morgan('dev', { stream: logger.stream }));
+  app.use(express.static(__dirname));
   app.use(passport.initialize());
 
   app.use('/api/users', users);
   app.use('/api/auth', auth);
+  app.use('/api/room', room);
 
   app.get('/', (req, res) => {
     res.send('Invalid endpoint!');
