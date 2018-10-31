@@ -69,7 +69,7 @@ controller.addFriend = async (req, res) => {
       logger.error(`Error- ${err}`);
       return res.status(500).send({ message: `Error- ${err}` });
     }
-}
+};
 
 /**
  * Route('/api/users/friends')
@@ -77,7 +77,7 @@ controller.addFriend = async (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-controller.removeFriend = async (req, res) => { 
+controller.removeFriend = async (req, res) => {
   try {
       passport.authenticate('jwt', { session: false }, async (err, user) => {
           if (err) { return res.status(500).send(err); }
@@ -121,11 +121,11 @@ controller.getFriends = async (req, res) => {
 };
 
 /**
-* Route('/api/users/friends/:id')
-* GET
-* @param {*} req
-* @param {*} res
-*/
+ * Route('/api/users/friends/:id')
+ * GET
+ * @param {*} req
+ * @param {*} res
+ */
 controller.getFriendProfile = async (req, res) => {
   try {
       passport.authenticate('jwt', { session: false }, async (err, user) => {

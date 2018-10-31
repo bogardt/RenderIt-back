@@ -135,10 +135,12 @@ controller.joinRoom = async (req, res) => {
             return res.status(201).send({ message: 'User successfully added' });
         })(req, res);
 
-    } catch (err) {
-        logger.error(`Error- ${err}`);
-        return res.status(500).send({ message: `Error- ${err}` });
-    }
+      return res.status(201).send({ message: 'User successfully added' });
+    });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
 };
 
 
