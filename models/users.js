@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 
-const bcrypt = require('bcrypt');
-
 const UserSchema = mongoose.Schema(
   {
     name: {
@@ -46,18 +44,18 @@ const UserSchema = mongoose.Schema(
   { collection: 'User' }
 );
 
-UserSchema.pre('save', function (next) {
-  const user = this;
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) return;
-    bcrypt.hash(user.password, salt, (errOnHash, hash) => {
-      if (errOnHash) return;
-      user.password = hash;
-      next();
-    });
-  });
-});
-
 const UserModel = mongoose.model('User', UserSchema);
+
+exports.test = async function test(email, callback) {
+  await User.findOne({email: email.email}, function(err, userObj) {
+      if(err) {
+          return callback(err, null);
+      } else if (userObj) {
+          return callback(null, userObj);
+      } else {
+          return callback(null, null);
+      }
+  });
+}
 
 export default UserModel;
