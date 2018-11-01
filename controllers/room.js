@@ -39,7 +39,6 @@ controller.createRoom = async (req, res) => {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
   }
-  return res.status(404).send({ message: 'Not found' });
 };
 
 /**
@@ -48,7 +47,14 @@ controller.createRoom = async (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-// controller.deleteRoom = (req, res) => {};
+controller.deleteRoom = async (req, res) => {
+  try {
+    return res.status(404).send({ message: 'Not found' });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
+};
 
 /**
  * Route('/api/room/:id')
@@ -88,7 +94,6 @@ controller.getRoom = async (req, res) => {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
   }
-  return res.status(404).send({ message: 'Not found' });
 };
 
 /**
@@ -130,7 +135,6 @@ controller.leaveRoom = async (req, res) => {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
   }
-  return res.status(404).send({ message: 'Not found' });
 };
 
 /**
