@@ -14,5 +14,6 @@ router
   .post(userController.addFriend)
   .delete(userController.removeFriend);
 router.route('/friends/:id').get(userController.getFriendProfile);
+router.route('/friends/pattern/:id').get(userController.searchFriends);
 
 export default router;

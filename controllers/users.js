@@ -204,4 +204,34 @@ controller.searchUser = async (req, res) => {
   }
 };
 
+/**
+ * Route('/api/users/friends/pattern/:id')
+ * GET
+ * @param {*} req
+ * @param {*} res
+ */
+controller.searchFriends = async (req, res) => {
+  try {
+    passport.authenticate('jwt', { session: false }, async (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
+      const regex = new RegExp(`^${req.params.id}`, 'i');
+      const friends = [];
+      for (let i = 0; i < user.friends.length; i++) {
+        if (user.friends[i].match(regex)) {
+          friends.push(user.friends[i]);
+        }
+      }
+      return res.status(200).send({ friends });
+    })(req, res);
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
+};
+
 export default controller;
