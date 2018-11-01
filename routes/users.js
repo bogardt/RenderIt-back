@@ -8,6 +8,7 @@ router.route('/').post(userController.register);
 //   .get(userController.getUser)
 //   .delete(userController.deleteUser);
 router.route('/friends')
+    .get(userController.getFriends)
     .post(userController.addFriend)
     .put(userController.removeFriend);
 router.route('/friends/:id')
