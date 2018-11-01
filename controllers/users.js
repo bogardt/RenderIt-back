@@ -173,4 +173,28 @@ controller.getFriendProfile = async (req, res) => {
   }
 };
 
+/**
+ * Route('/api/users/:pattern')
+ * GET
+ * @param {*} req
+ * @param {*} res
+ */
+controller.searchUser = async (req, res) => {
+  try {
+    passport.authenticate('jwt', { session: false }, async (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
+      const users = await User.find({ email: { $regex: req.params.id, $options: 'i' } });
+      return res.status(200).send({ users });
+    })(req, res);
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
+};
+
 export default controller;
