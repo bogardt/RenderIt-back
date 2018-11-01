@@ -75,6 +75,7 @@ controller.addFriend = async (req, res) => {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
   }
+  return res.status(404).send({ message: 'Not found' });
 };
 
 /**
@@ -99,7 +100,7 @@ controller.removeFriend = async (req, res) => {
       }
 
       const userIndex = user.friends.indexOf(friend.email);
-      if (userIndex == -1) {
+      if (userIndex === -1) {
         return res.status(401).send({ message: 'Unauthorized : user not in friends list' });
       }
 
@@ -112,6 +113,7 @@ controller.removeFriend = async (req, res) => {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
   }
+  return res.status(404).send({ message: 'Not found' });
 };
 
 /**
@@ -136,6 +138,7 @@ controller.getFriends = async (req, res) => {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
   }
+  return res.status(404).send({ message: 'Not found' });
 };
 
 /**
@@ -171,6 +174,7 @@ controller.getFriendProfile = async (req, res) => {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
   }
+  return res.status(404).send({ message: 'Not found' });
 };
 
 export default controller;

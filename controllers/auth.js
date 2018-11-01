@@ -37,6 +37,7 @@ controller.login = async (req, res) => {
     logger.error(`Error in register user- ${err}`);
     return res.status(500).send({ message: `Error in register user- ${err}` });
   }
+  return res.status(404).send({ message: 'Not found' });
 };
 
 /**
@@ -64,6 +65,7 @@ controller.me = async (req, res) => {
     logger.error(`Error in register user- ${err}`);
     return res.status(500).send(err);
   }
+  return res.status(404).send({ message: 'Not found' });
 };
 
 export default controller;

@@ -1,21 +1,19 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
 
-var MessageModel = new Schema({
+const MessageSchema = mongoose.Schema({
   message: {
     type: String,
     require: true
   },
   from: {
-      type: string,
-      require: true
+    type: String,
+    require: true
   },
   to: {
-      type: Array,
-      of: string,
-      require: true
+    type: Array,
+    of: String,
+    require: true
   }
 });
 
-const Message = module.exports = mongoose.model("Message", MessageModel);
+const Message = mongoose.model('Message', MessageSchema);

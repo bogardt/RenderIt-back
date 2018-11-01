@@ -46,16 +46,4 @@ const UserSchema = mongoose.Schema(
 
 const UserModel = mongoose.model('User', UserSchema);
 
-exports.test = async function test(email, callback) {
-  await User.findOne({email: email.email}, function(err, userObj) {
-      if(err) {
-          return callback(err, null);
-      } else if (userObj) {
-          return callback(null, userObj);
-      } else {
-          return callback(null, null);
-      }
-  });
-}
-
 export default UserModel;

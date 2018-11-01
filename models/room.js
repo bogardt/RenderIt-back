@@ -1,16 +1,14 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
 
-var RoomModel = new Schema({
+const RoomSchema = mongoose.Schema({
   name: {
     type: String,
     require: false
   },
   users: {
-      type: Array,
-      of: String,
-      require: true
+    type: Array,
+    of: String,
+    require: true
   },
   history: {
     type: Array,
@@ -19,4 +17,6 @@ var RoomModel = new Schema({
   }
 });
 
-const Room = module.exports = mongoose.model("Room", RoomModel);
+const Room = mongoose.model('Room', RoomSchema);
+
+export default Room;
