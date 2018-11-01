@@ -174,7 +174,7 @@ controller.getFriendProfile = async (req, res) => {
 };
 
 /**
- * Route('/api/users/:pattern')
+ * Route('/api/users/pattern/:id')
  * GET
  * @param {*} req
  * @param {*} res
@@ -189,7 +189,14 @@ controller.searchUser = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
       const users = await User.find({ email: { $regex: req.params.id, $options: 'i' } });
-      return res.status(200).send({ users });
+      const tmp = [];
+      for (var i = 0; i < users.length; i++) {
+        tmp[i] = {
+          email: users[i].email,
+          friend: user.friends.indexOf(users[i].email) !== -1
+        };
+      }
+      return res.status(200).send({ users: tmp });
     })(req, res);
   } catch (err) {
     logger.error(`Error- ${err}`);

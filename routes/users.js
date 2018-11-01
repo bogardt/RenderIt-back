@@ -7,7 +7,7 @@ router.route('/').post(userController.register);
 //   .put(userController.update)
 //   .get(userController.getUser)
 //   .delete(userController.deleteUser);
-router.route('/pattern/:id').post(userController.searchUser);
+router.route('/pattern/:id').get(userController.searchUser);
 router
   .route('/friends')
   .get(userController.getFriends)
