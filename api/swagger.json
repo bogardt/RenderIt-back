@@ -1,167 +1,347 @@
 {
-    "swagger": "2.0",
-    "info": {
-        "title": "Render-it Apis",
-        "description": "Api for a slack like.",
-        "version": "1.0"
-    },
-    "produces": [
-        "application/json"
-    ],
-    "host": "localhost:4000",
-    "basePath": "/api",
-    "paths": {
-        "/api/users": {
-            "post": {
-                "operationId": "register",
-                "summary": "Register to webiste",
-                "tags": [
-                    "Register"
-                ],
-                "description": "Register a new user to our website",
-                "parameters": [
-                    {
-                        "name": "register",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/Register"
-                        }
-                    }
-                ],
-                "responses": {
-                    "default": {
-                        "description": "Invalid request."
-                    },
-                    "201": {
-                        "description": "Successful request."
-                    },
-                    "409": {
-                        "description": "Conflict email already in use."
-                    }
-                }
+  "swagger": "2.0",
+  "info": {
+    "title": "Render-it Apis",
+    "description": "Api for a slack like.",
+    "version": "1.0"
+  },
+  "produces": [
+    "application/json"
+  ],
+  "host": "localhost:4000",
+  "basePath": "/api",
+  "paths": {
+    "/api/users/friends": {
+      "post": {
+        "operationId": "Add friend",
+        "summary": "Add friend to user which request",
+        "tags": [
+          "Friends"
+        ],
+        "description": "Add friend",
+        "parameters": [
+          {
+            "name": "addfriend",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/AddFriend"
             }
-        },
-        "/api/auth/login": {
-            "post": {
-                "operationId": "login",
-                "summary": "Login to website",
-                "tags": [
-                    "Login"
-                ],
-                "description": "Login to our website.",
-                "parameters": [
-                    {
-                        "name": "login",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/Login"
-                        }
-                    }
-                ],
-                "responses": {
-                    "default": {
-                        "description": "Invalid request."
-                    },
-                    "200": {
-                        "description": "Successful request."
-                    },
-                    "409": {
-                        "description": "Conflict email already in use."
-                    }
-                }
-            }
-        },
-        "/api/auth/me": {
-            "get": {
-                "operationId": "me",
-                "summary": "Get personal data",
-                "tags": [
-                    "Me"
-                ],
-                "description": "Get information by bearer token",
-                "parameters": [
-                    {
-                        "name": "bearer",
-                        "in": "header",
-                        "description": "JWT",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful request.",
-                        "schema": {
-                            "$ref": "#/definitions/Me"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized."
-                    }
-                }
-            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "201": {
+            "description": "Successful request."
+          },
+          "409": {
+            "description": "Already in friends list."
+          }
         }
-    },
-    "definitions": {
-        "Register": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string",
-                    "default": "test@test.org"
-                },
-                "username": {
-                    "type": "string",
-                    "default": "usernmae"
-                },
-                "password": {
-                    "type": "string",
-                    "default": "password"
-                }
-            },
-            "required": [
-                "email",
-                "username",
-                "password"
-            ]
-        },
-        "Login": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string",
-                    "default": "test@test.org"
-                },
-                "password": {
-                    "type": "string",
-                    "default": "password"
-                }
-            },
-            "required": [
-                "email",
-                "password"
-            ]
-        },
-        "Me": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string",
-                    "default": "test@test.org"
-                },
-                "username": {
-                    "type": "string",
-                    "default": "username"
-                },
-                "role": {
-                    "type": "string",
-                    "default": "admin",
-                    "enum": [
-                        "admin",
-                        "user"
-                    ]
-                }
-            }
+      },
+      "get": {
+        "operationId": "Get friends",
+        "summary": "Get all friends",
+        "tags": [
+          "Friends"
+        ],
+        "description": "Get friends",
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
+          }
         }
+      },
+      "delete": {
+        "operationId": "Remove friend",
+        "summary": "Remove a friend",
+        "tags": [
+          "Friends"
+        ],
+        "description": "Remove friend",
+        "parameters": [
+          {
+            "name": "removefriend",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/RemoveFriend"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "201": {
+            "description": "Successful request."
+          },
+          "409": {
+            "description": "Already in friends list."
+          }
+        }
+      }
+    },
+    "/api/users/friends/{email}": {
+      "get": {
+        "operationId": "Get friend profile",
+        "summary": "Get a friend profile by email",
+        "tags": [
+          "Friends"
+        ],
+        "description": "Get friend profile",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "email of friend"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
+          }
+        }
+      }
+    },
+    "/api/users/friends/pattern/{text}": {
+      "get": {
+        "operationId": "Get friends by email text regex",
+        "summary": "Get a friends by email text regex",
+        "tags": [
+          "Friends"
+        ],
+        "description": "Get friends by email text regex",
+        "parameters": [
+          {
+            "name": "text",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "friends by email text regex"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
+          }
+        }
+      }
+    },
+    
+    "/api/users": {
+      "post": {
+        "operationId": "register",
+        "summary": "Register to webiste",
+        "tags": [
+          "Users"
+        ],
+        "description": "Register a new user to our website",
+        "parameters": [
+          {
+            "name": "register",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Register"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "201": {
+            "description": "Successful request."
+          },
+          "409": {
+            "description": "Conflict email already in use."
+          }
+        }
+      }
+    },
+    "/api/users/pattern/{text}": {
+      "get": {
+        "operationId": "Get users by text regex",
+        "summary": "Get a users by text regex",
+        "tags": [
+          "Users"
+        ],
+        "description": "Get users by text regex",
+        "parameters": [
+          {
+            "name": "text",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "users by text regex"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "login",
+        "summary": "Login to website",
+        "tags": [
+          "Auth"
+        ],
+        "description": "Login to our website.",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Login"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
+          },
+          "409": {
+            "description": "Conflict email already in use."
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "me",
+        "summary": "Get personal data",
+        "tags": [
+          "Auth"
+        ],
+        "description": "Get information by bearer token",
+        "parameters": [
+          {
+            "name": "bearer",
+            "in": "header",
+            "description": "JWT",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "schema": {
+              "$ref": "#/definitions/Me"
+            }
+          },
+          "401": {
+            "description": "Unauthorized."
+          }
+        }
+      }
     }
+  },
+  "definitions": {
+    "AddFriend": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "default": "test@test.org"
+        }
+      },
+      "required": [
+        "email"
+      ]
+    },
+    "RemoveFriend": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "default": "test@test.org"
+        }
+      },
+      "required": [
+        "email"
+      ]
+    },
+    "Register": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "default": "test@test.org"
+        },
+        "username": {
+          "type": "string",
+          "default": "usernmae"
+        },
+        "password": {
+          "type": "string",
+          "default": "password"
+        }
+      },
+      "required": [
+        "email",
+        "username",
+        "password"
+      ]
+    },
+    "Login": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "default": "test@test.org"
+        },
+        "password": {
+          "type": "string",
+          "default": "password"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
+    "Me": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "default": "test@test.org"
+        },
+        "username": {
+          "type": "string",
+          "default": "username"
+        },
+        "role": {
+          "type": "string",
+          "default": "admin",
+          "enum": [
+            "admin",
+            "user"
+          ]
+        }
+      }
+    }
+  }
 }

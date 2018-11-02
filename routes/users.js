@@ -7,13 +7,15 @@ router.route('/').post(userController.register);
 //   .put(userController.update)
 //   .get(userController.getUser)
 //   .delete(userController.deleteUser);
-router.route('/pattern/:id').post(userController.searchUser);
+router.route('/pattern/:id').get(userController.searchUser);
 router
   .route('/friends')
   .get(userController.getFriends)
   .post(userController.addFriend)
   .put(userController.removeFriend);
-router.route('/friend/:id').get(userController.getFriendProfile);
 router.route('/rooms').get(userController.getRooms);
+router.route('/friends/:id').get(userController.getFriendProfile);
+router.route('/friends/:id').delete(userController.removeFriend);
+router.route('/friends/pattern/:id').get(userController.searchFriends);
 
 export default router;

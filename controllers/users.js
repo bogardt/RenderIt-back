@@ -96,7 +96,7 @@ controller.removeFriend = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
 
-      const friend = await User.findOne({ email: req.body.email });
+      const friend = await User.findOne({ email: req.params.id });
       if (!friend) {
         return res.status(409).send({ message: 'User does not exist' });
       }
@@ -143,8 +143,8 @@ controller.getFriends = async (req, res) => {
 
 /**
  * Route('/api/users/friends/:id')
- * @param {*} req
  * GET
+ * @param {*} req
  * @param {*} res
  */
 controller.getFriendProfile = async (req, res) => {
@@ -177,7 +177,7 @@ controller.getFriendProfile = async (req, res) => {
 };
 
 /**
- * Route('/api/users/:pattern')
+ * Route('/api/users/pattern/:id')
  * GET
  * @param {*} req
  * @param {*} res
@@ -192,7 +192,44 @@ controller.searchUser = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
       const users = await User.find({ email: { $regex: req.params.id, $options: 'i' } });
-      return res.status(200).send({ users });
+      const tmp = [];
+      for (let i = 0; i < users.length; i += 1) {
+        tmp[i] = {
+          email: users[i].email,
+          friend: user.friends.indexOf(users[i].email) !== -1
+        };
+      }
+      return res.status(200).send({ users: tmp });
+    })(req, res);
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
+};
+
+/**
+ * Route('/api/users/friends/pattern/:id')
+ * GET
+ * @param {*} req
+ * @param {*} res
+ */
+controller.searchFriends = async (req, res) => {
+  try {
+    passport.authenticate('jwt', { session: false }, async (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
+      const regex = new RegExp(`^${req.params.id}`, 'i');
+      const friends = [];
+      for (let i = 0; i < user.friends.length; i++) {
+        if (user.friends[i].match(regex)) {
+          friends.push(user.friends[i]);
+        }
+      }
+      return res.status(200).send({ friends });
     })(req, res);
   } catch (err) {
     logger.error(`Error- ${err}`);
