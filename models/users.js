@@ -2,6 +2,10 @@ import mongoose from 'mongoose';
 
 const UserSchema = mongoose.Schema(
   {
+    socket: {
+      type: String,
+      require: false
+    },
     name: {
       type: String,
       require: true
@@ -21,12 +25,10 @@ const UserSchema = mongoose.Schema(
     },
     rooms: {
       type: Array,
-      of: String,
       require: false
     },
     friends: {
       type: Array,
-      of: String,
       require: false
     },
     description: {

@@ -12,7 +12,8 @@ router
   .route('/friends')
   .get(userController.getFriends)
   .post(userController.addFriend)
-  .delete(userController.removeFriend);
-router.route('/friends/:id').get(userController.getFriendProfile);
+  .put(userController.removeFriend);
+router.route('/friend/:id').get(userController.getFriendProfile);
+router.route('/rooms').get(userController.getRooms);
 
 export default router;

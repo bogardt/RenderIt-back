@@ -21,6 +21,7 @@ controller.createRoom = async (req, res) => {
       if (err) {
         return res.status(500).send(err);
       }
+
       if (!user) {
         return res.status(401).send({ message: 'Unauthorized' });
       }
@@ -28,9 +29,10 @@ controller.createRoom = async (req, res) => {
       const newRoom = new Room();
       newRoom.name = req.body.name;
       newRoom.users.push(user.email);
+      newRoom.history = [];
       await newRoom.save();
 
-      user.rooms.push(newRoom.name);
+      user.rooms.push(newRoom);
       await user.save();
 
       return res.status(201).send({ message: 'Room successfully created' });
@@ -72,15 +74,29 @@ controller.getRoom = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
 
-      const room = await Room.findOne({ name: req.param.id });
+      const room = await Room.findOne({ name: req.params.id });
       if (!room) {
         return res.status(409).send({ message: 'Room does not exist' });
       }
 
-      const roomIndex = room.users.indexOf(user.email);
-      const userIndex = user.rooms.indexOf(room.name);
-      if (roomIndex === -1 || userIndex === -1) {
-        return res.status(401).send({ message: 'Unauthorized : user not in room' });
+      const roomIndex = room.users.find(element => element === user.email);
+      const userIndex = user.rooms.find(element => element.name === room.name);
+      if (!roomIndex) {
+        return res.status(201).send({
+          message: 'Success',
+          name: room.name,
+          history: [],
+          users: room.users
+        });
+      }
+
+      if (!userIndex) {
+        return res.status(201).send({
+          message: 'Success',
+          name: room.name,
+          history: [],
+          users: room.users
+        });
       }
 
       return res.status(201).send({
@@ -98,7 +114,7 @@ controller.getRoom = async (req, res) => {
 
 /**
  * Route('/api/room/:id/leave')
- * POST
+ * PUT
  * @param {*} req
  * @param {*} res
  */
@@ -112,14 +128,17 @@ controller.leaveRoom = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
 
-      const room = await Room.findOne({ name: req.param.id });
+      const room = await Room.findOne({ name: req.params.id });
       if (!room) {
         return res.status(409).send({ message: 'Room does not exist' });
       }
 
       const roomIndex = room.users.indexOf(user.email);
-      const userIndex = user.rooms.indexOf(room.name);
-      if (roomIndex === -1 || userIndex === -1) {
+      const userIndex = user.rooms.findIndex(index => index.name === room.name);
+      if (roomIndex === -1) {
+        return res.status(401).send({ message: 'Unauthorized : user not in room' });
+      }
+      if (userIndex === -1) {
         return res.status(401).send({ message: 'Unauthorized : user not in room' });
       }
 
@@ -138,8 +157,8 @@ controller.leaveRoom = async (req, res) => {
 };
 
 /**
- * Route('/api/room/:id/join/:userId')
- * POST
+ * Route('/api/room/:id/join/')
+ * PUT
  * @param {*} req
  * @param {*} res
  */
@@ -153,8 +172,8 @@ controller.joinRoom = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
 
-      const room = await Room.findOne({ name: req.param.id });
-      const newUser = await User.findOne({ email: req.param.userId });
+      const room = await Room.findOne({ name: req.params.id });
+      const newUser = await User.findOne({ email: user.email });
       if (!newUser) {
         return res.status(409).send({ message: 'User does not exist' });
       }
@@ -162,16 +181,19 @@ controller.joinRoom = async (req, res) => {
         return res.status(409).send({ message: 'Room does not exist' });
       }
 
+      const roomIndex = room.users.indexOf(user.email);
+      if (roomIndex !== -1) {
+        return res.status(409).send({ message: 'User already registered in room' });
+      }
+
       room.users.push(newUser.email);
       await room.save();
 
-      newUser.rooms.push(room.name);
+      newUser.rooms.push(room);
       await newUser.save();
 
-      return res.status(201).send({ message: 'User successfully added' });
+      return res.status(201).send({ message: 'User successfully added to room' });
     })(req, res);
-
-    return res.status(201).send({ message: 'User successfully added' });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });

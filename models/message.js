@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import UserModel from './users';
 
 const MessageSchema = mongoose.Schema({
   message: {
@@ -6,12 +7,11 @@ const MessageSchema = mongoose.Schema({
     require: true
   },
   from: {
-    type: String,
+    type: UserModel,
     require: true
   },
   to: {
-    type: Array,
-    of: String,
+    type: String,
     require: true
   }
 });

@@ -7,12 +7,10 @@ const RoomSchema = mongoose.Schema({
   },
   users: {
     type: Array,
-    of: String,
     require: true
   },
   history: {
     type: Array,
-    of: String,
     require: false
   }
 });

@@ -8,7 +8,7 @@ router
   .route('/:id')
   .get(roomController.getRoom)
   .delete(roomController.deleteRoom);
-router.route('/:id/leave').post(roomController.leaveRoom);
-router.route('/:id/join/:userId').post(roomController.joinRoom);
+router.route('/:id/leave').put(roomController.leaveRoom);
+router.route('/:id/join/').put(roomController.joinRoom);
 
 export default router;

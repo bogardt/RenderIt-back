@@ -62,11 +62,14 @@ controller.addFriend = async (req, res) => {
         return res.status(404).send({ message: 'Profile not found' });
       }
 
-      if (user.friends.includes(friend.email)) {
-        return res.status(409).send({ message: 'Already in friends list' });
+      if (friend.email === user.email) {
+        return res.status(409).send({ message: 'You can not add yourself as a friend' });
       }
 
-      user.friends.push(friend.email);
+      const result = user.friends.find(element => element.email === friend.email);
+      if (result) return res.status(409).send({ message: 'Already in friends list' });
+
+      user.friends.push(friend);
       await user.save();
 
       return res.status(201).send({ message: 'friend successfully added' });
@@ -98,7 +101,7 @@ controller.removeFriend = async (req, res) => {
         return res.status(409).send({ message: 'User does not exist' });
       }
 
-      const userIndex = user.friends.indexOf(friend.email);
+      const userIndex = user.friends.findIndex(element => element.email === friend.email);
       if (userIndex === -1) {
         return res.status(401).send({ message: 'Unauthorized : user not in friends list' });
       }
@@ -140,8 +143,8 @@ controller.getFriends = async (req, res) => {
 
 /**
  * Route('/api/users/friends/:id')
- * GET
  * @param {*} req
+ * GET
  * @param {*} res
  */
 controller.getFriendProfile = async (req, res) => {
@@ -154,17 +157,17 @@ controller.getFriendProfile = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
 
-      const friend = await User.findOne({ email: req.param.id });
+      const friend = await User.findOne({ email: req.params.id });
       if (!friend) {
         return res.status(409).send({ message: 'User does not exist' });
       }
 
-      return res.status(201).send({
+      return res.status(200).send({
         message: 'Success',
         name: friend.name,
-        email: user.email,
-        username: user.username,
-        description: user.description
+        email: friend.email,
+        username: friend.username,
+        description: friend.description
       });
     })(req, res);
   } catch (err) {
@@ -190,6 +193,30 @@ controller.searchUser = async (req, res) => {
       }
       const users = await User.find({ email: { $regex: req.params.id, $options: 'i' } });
       return res.status(200).send({ users });
+    })(req, res);
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
+};
+
+/**
+ * Route('/api/users/rooms')
+ * GET
+ * @param {*} req
+ * @param {*} res
+ */
+controller.getRooms = async (req, res) => {
+  try {
+    passport.authenticate('jwt', { session: false }, async (err, user) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      if (!user) {
+        return res.status(401).send({ message: 'Unauthorized' });
+      }
+
+      return res.status(201).send({ message: 'Success', rooms: user.rooms });
     })(req, res);
   } catch (err) {
     logger.error(`Error- ${err}`);
