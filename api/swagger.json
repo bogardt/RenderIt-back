@@ -114,7 +114,7 @@
     },
     "/api/users/friends/pattern/{text}": {
       "get": {
-        "operationId": "Get friend by email text regex",
+        "operationId": "Get friends by email text regex",
         "summary": "Get a friends by email text regex",
         "tags": [
           "Friends"
@@ -145,7 +145,7 @@
         "operationId": "register",
         "summary": "Register to webiste",
         "tags": [
-          "Auth"
+          "Users"
         ],
         "description": "Register a new user to our website",
         "parameters": [
@@ -166,6 +166,33 @@
           },
           "409": {
             "description": "Conflict email already in use."
+          }
+        }
+      }
+    },
+    "/api/users/pattern/{text}": {
+      "get": {
+        "operationId": "Get users by text regex",
+        "summary": "Get a users by text regex",
+        "tags": [
+          "Users"
+        ],
+        "description": "Get users by text regex",
+        "parameters": [
+          {
+            "name": "text",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "users by text regex"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
           }
         }
       }
