@@ -5,6 +5,10 @@ import Message from '../models/message';
 async function HandleAuthorization(id, socket) {
   const user = await User.findOne({ email: id });
   if (user) {
+    if (user.socket) {
+      socket.emit('error', 'User already authorized');
+      return;
+    }
     user.socket = socket.id;
     await user.save();
     socket.emit('success', 'User successfully authorized');
