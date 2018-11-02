@@ -93,7 +93,7 @@ controller.removeFriend = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
 
-      const friend = await User.findOne({ email: req.body.email });
+      const friend = await User.findOne({ email: req.params.id });
       if (!friend) {
         return res.status(409).send({ message: 'User does not exist' });
       }
