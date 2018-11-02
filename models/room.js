@@ -10,11 +10,10 @@ const RoomSchema = mongoose.Schema({
     require: true
   },
   history: {
-    type: Array,
+    type: [],
     require: false
   }
 });
-
 const Room = mongoose.model('Room', RoomSchema);
 
 export default Room;

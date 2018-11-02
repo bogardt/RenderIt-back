@@ -1,5 +1,7 @@
 import passport from 'passport';
 import User from '../models/users';
+import Message from '../models/message';
+import Room from '../models/room';
 import logger from '../modules/winston';
 
 const bcrypt = require('bcrypt');

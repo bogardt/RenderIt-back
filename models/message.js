@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import UserModel from './users';
 
 const MessageSchema = mongoose.Schema({
   message: {
@@ -7,13 +6,18 @@ const MessageSchema = mongoose.Schema({
     require: true
   },
   from: {
-    type: UserModel,
+    type: [],
     require: true
   },
   to: {
     type: String,
     require: true
+  },
+  date: {
+    type: Date,
+    require: true
   }
 });
-
 const Message = mongoose.model('Message', MessageSchema);
+
+export default Message;

@@ -83,7 +83,7 @@ controller.getRoom = async (req, res) => {
       const userIndex = user.rooms.find(element => element.name === room.name);
       if (!roomIndex) {
         return res.status(201).send({
-          message: 'Success',
+          message: 'Not in room',
           name: room.name,
           history: [],
           users: room.users
@@ -92,7 +92,7 @@ controller.getRoom = async (req, res) => {
 
       if (!userIndex) {
         return res.status(201).send({
-          message: 'Success',
+          message: 'Not in room',
           name: room.name,
           history: [],
           users: room.users
