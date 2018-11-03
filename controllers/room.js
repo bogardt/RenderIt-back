@@ -1,13 +1,9 @@
-import passport from 'passport';
 import logger from '../modules/winston';
 import Room from '../models/room';
 import User from '../models/users';
-
-const jwtStrategry = require('../modules/passport');
+import { PassportAuthUser } from '../modules/utils';
 
 const controller = {};
-
-passport.use(jwtStrategry);
 
 /**
  * Route('/api/room')
@@ -17,26 +13,17 @@ passport.use(jwtStrategry);
  */
 controller.createRoom = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
+    const user = await PassportAuthUser(req, res);
+    const newRoom = new Room();
+    newRoom.name = req.body.name;
+    newRoom.users.push(user.id);
+    newRoom.history = [];
+    await newRoom.save();
 
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
+    user.rooms.push(newRoom);
+    await user.save();
 
-      const newRoom = new Room();
-      newRoom.name = req.body.name;
-      newRoom.users.push(user.id);
-      newRoom.history = [];
-      await newRoom.save();
-
-      user.rooms.push(newRoom);
-      await user.save();
-
-      return res.status(201).send({ message: 'Room successfully created', room: newRoom });
-    })(req, res);
+    return res.status(201).send({ message: 'Room successfully created', room: newRoom });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
@@ -66,49 +53,42 @@ controller.deleteRoom = async (req, res) => {
  */
 controller.getRoom = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
+    const user = await PassportAuthUser(req, res);
 
-      const room = await Room.findOne({ id: req.params.id });
-      if (!room) {
-        return res.status(409).send({ message: 'Room does not exist' });
-      }
+    const room = await Room.findOne({ id: req.params.id });
+    if (!room) {
+      return res.status(409).send({ message: 'Room does not exist' });
+    }
 
-      const roomIndex = room.users.indexOf(user.id);
-      const userIndex = user.rooms.findIndex(element => element.id === room.id);
-      if (roomIndex === -1) {
-        return res.status(200).send({
-          message: 'Not in room',
-          name: room.name,
-          id: room.id,
-          history: [],
-          users: room.users
-        });
-      }
-
-      if (!userIndex) {
-        return res.status(200).send({
-          message: 'Not in room',
-          name: room.name,
-          id: room.id,
-          history: [],
-          users: room.users
-        });
-      }
-
+    const roomIndex = room.users.indexOf(user.id);
+    const userIndex = user.rooms.findIndex(element => element.id === room.id);
+    if (roomIndex === -1) {
       return res.status(200).send({
-        message: 'Success',
+        message: 'Not in room',
         name: room.name,
         id: room.id,
-        history: room.history,
+        history: [],
         users: room.users
       });
-    })(req, res);
+    }
+
+    if (!userIndex) {
+      return res.status(200).send({
+        message: 'Not in room',
+        name: room.name,
+        id: room.id,
+        history: [],
+        users: room.users
+      });
+    }
+
+    return res.status(200).send({
+      message: 'Success',
+      name: room.name,
+      id: room.id,
+      history: room.history,
+      users: room.users
+    });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
@@ -123,36 +103,29 @@ controller.getRoom = async (req, res) => {
  */
 controller.leaveRoom = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
+    const user = await PassportAuthUser(req, res);
 
-      const room = await Room.findOne({ id: req.params.id });
-      if (!room) {
-        return res.status(409).send({ message: 'Room does not exist' });
-      }
+    const room = await Room.findOne({ id: req.params.id });
+    if (!room) {
+      return res.status(409).send({ message: 'Room does not exist' });
+    }
 
-      const roomIndex = room.users.indexOf(user.id);
-      const userIndex = user.rooms.findIndex(element => element.id === room.id);
-      if (roomIndex === -1) {
-        return res.status(401).send({ message: 'Unauthorized : user not in room' });
-      }
-      if (!userIndex) {
-        return res.status(401).send({ message: 'Unauthorized : user not in room' });
-      }
+    const roomIndex = room.users.indexOf(user.id);
+    const userIndex = user.rooms.findIndex(element => element.id === room.id);
+    if (roomIndex === -1) {
+      return res.status(401).send({ message: 'Unauthorized : user not in room' });
+    }
+    if (!userIndex) {
+      return res.status(401).send({ message: 'Unauthorized : user not in room' });
+    }
 
-      room.users.splice(roomIndex, 1);
-      await room.save();
+    room.users.splice(roomIndex, 1);
+    await room.save();
 
-      user.rooms.splice(userIndex, 1);
-      await user.save();
+    user.rooms.splice(userIndex, 1);
+    await user.save();
 
-      return res.status(201).send({ message: 'Success' });
-    })(req, res);
+    return res.status(201).send({ message: 'Success' });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
@@ -167,36 +140,29 @@ controller.leaveRoom = async (req, res) => {
  */
 controller.joinRoom = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
+    const user = await PassportAuthUser(req, res);
 
-      const room = await Room.findOne({ id: req.params.id });
-      const newUser = await User.findOne({ email: user.email });
-      if (!newUser) {
-        return res.status(409).send({ message: 'User does not exist' });
-      }
-      if (!room) {
-        return res.status(409).send({ message: 'Room does not exist' });
-      }
+    const room = await Room.findOne({ id: req.params.id });
+    const newUser = await User.findOne({ email: user.email });
+    if (!newUser) {
+      return res.status(409).send({ message: 'User does not exist' });
+    }
+    if (!room) {
+      return res.status(409).send({ message: 'Room does not exist' });
+    }
 
-      const roomIndex = room.users.indexOf(user.id);
-      if (roomIndex !== -1) {
-        return res.status(409).send({ message: 'User already registered in room' });
-      }
+    const roomIndex = room.users.indexOf(user.id);
+    if (roomIndex !== -1) {
+      return res.status(409).send({ message: 'User already registered in room' });
+    }
 
-      room.users.push(newUser.id);
-      await room.save();
+    room.users.push(newUser.id);
+    await room.save();
 
-      newUser.rooms.push(room);
-      await newUser.save();
+    newUser.rooms.push(room);
+    await newUser.save();
 
-      return res.status(201).send({ message: 'User successfully added to room' });
-    })(req, res);
+    return res.status(201).send({ message: 'User successfully added to room' });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });

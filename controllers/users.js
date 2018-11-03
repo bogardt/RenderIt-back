@@ -1,16 +1,10 @@
-import passport from 'passport';
 import User from '../models/users';
-import Message from '../models/message';
-import Room from '../models/room';
 import logger from '../modules/winston';
+import { PassportAuthUser } from '../modules/utils';
 
 const bcrypt = require('bcrypt');
 
-const jwtStrategry = require('../modules/passport');
-
 const controller = {};
-
-passport.use(jwtStrategry);
 
 /**
  * Route('/api/users/register')
@@ -50,32 +44,25 @@ controller.register = async (req, res) => {
  */
 controller.addFriend = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
+    const user = await PassportAuthUser(req, res);
 
-      const friend = await User.findOne({ id: req.body.id });
+    const friend = await User.findOne({ id: req.body.id });
 
-      if (!friend) {
-        return res.status(404).send({ message: 'Profile not found' });
-      }
+    if (!friend) {
+      return res.status(404).send({ message: 'Profile not found' });
+    }
 
-      if (friend.email === user.email) {
-        return res.status(409).send({ message: 'You can not add yourself as a friend' });
-      }
+    if (friend.email === user.email) {
+      return res.status(409).send({ message: 'You can not add yourself as a friend' });
+    }
 
-      const result = user.friends.find(element => element.id === friend.id);
-      if (result) return res.status(409).send({ message: 'Already in friends list' });
+    const result = user.friends.find(element => element.id === friend.id);
+    if (result) return res.status(409).send({ message: 'Already in friends list' });
 
-      user.friends.push(friend);
-      await user.save();
+    user.friends.push(friend);
+    await user.save();
 
-      return res.status(201).send({ message: 'friend successfully added' });
-    })(req, res);
+    return res.status(201).send({ message: 'friend successfully added' });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
@@ -90,29 +77,22 @@ controller.addFriend = async (req, res) => {
  */
 controller.removeFriend = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
+    const user = await PassportAuthUser(req, res);
 
-      const friend = await User.findOne({ id: req.params.id });
-      if (!friend) {
-        return res.status(409).send({ message: 'User does not exist' });
-      }
+    const friend = await User.findOne({ id: req.params.id });
+    if (!friend) {
+      return res.status(409).send({ message: 'User does not exist' });
+    }
 
-      const userIndex = user.friends.findIndex(element => element.id === friend.id);
-      if (userIndex === -1) {
-        return res.status(401).send({ message: 'Unauthorized : user not in friends list' });
-      }
+    const userIndex = user.friends.findIndex(element => element.id === friend.id);
+    if (userIndex === -1) {
+      return res.status(401).send({ message: 'Unauthorized : user not in friends list' });
+    }
 
-      user.friends.splice(userIndex, 1);
-      await user.save();
+    user.friends.splice(userIndex, 1);
+    await user.save();
 
-      return res.status(201).send({ message: 'Success' });
-    })(req, res);
+    return res.status(201).send({ message: 'Success' });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
@@ -127,16 +107,8 @@ controller.removeFriend = async (req, res) => {
  */
 controller.getFriends = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
-
-      return res.status(201).send({ message: 'Success', friends: user.friends });
-    })(req, res);
+    const user = await PassportAuthUser(req, res);
+    return res.status(201).send({ message: 'Success', friends: user.friends });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
@@ -151,28 +123,22 @@ controller.getFriends = async (req, res) => {
  */
 controller.getFriendProfile = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
-
-      const friend = await User.findOne({ id: req.params.id });
-      if (!friend) {
-        return res.status(409).send({ message: 'User does not exist' });
-      }
-
-      return res.status(200).send({
-        message: 'Success',
-        id: friend.id,
-        name: friend.name,
-        email: friend.email,
-        username: friend.username,
-        description: friend.description
-      });
-    })(req, res);
+    const user = await PassportAuthUser(req, res);
+    if (!user) {
+      return res.status(401).send({ message: 'Unauthorized.' });
+    }
+    const friend = await User.findOne({ id: req.params.id });
+    if (!friend) {
+      return res.status(409).send({ message: 'User does not exist' });
+    }
+    return res.status(200).send({
+      message: 'Success',
+      id: friend.id,
+      name: friend.name,
+      email: friend.email,
+      username: friend.username,
+      description: friend.description
+    });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
@@ -187,23 +153,16 @@ controller.getFriendProfile = async (req, res) => {
  */
 controller.searchUser = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
-      const users = await User.find({ email: { $regex: req.params.id, $options: 'i' } });
-      const tmp = [];
-      for (let i = 0; i < users.length; i += 1) {
-        tmp[i] = {
-          email: users[i].email,
-          friend: user.friends.indexOf(users[i].email) !== -1
-        };
-      }
-      return res.status(200).send({ users: tmp });
-    })(req, res);
+    const user = await PassportAuthUser(req, res);
+    const users = await User.find({ email: { $regex: req.params.id, $options: 'i' } });
+    const tmp = [];
+    for (let i = 0; i < users.length; i += 1) {
+      tmp[i] = {
+        email: users[i].email,
+        friend: user.friends.indexOf(users[i].email) !== -1
+      };
+    }
+    return res.status(200).send({ users: tmp });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
@@ -218,22 +177,15 @@ controller.searchUser = async (req, res) => {
  */
 controller.searchFriends = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
+    const user = await PassportAuthUser(req, res);
+    const regex = new RegExp(`^${req.params.id}`, 'i');
+    const friends = [];
+    for (let i = 0; i < user.friends.length; i += 1) {
+      if (user.friends[i].match(regex)) {
+        friends.push(user.friends[i]);
       }
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
-      const regex = new RegExp(`^${req.params.id}`, 'i');
-      const friends = [];
-      for (let i = 0; i < user.friends.length; i++) {
-        if (user.friends[i].match(regex)) {
-          friends.push(user.friends[i]);
-        }
-      }
-      return res.status(200).send({ friends });
-    })(req, res);
+    }
+    return res.status(200).send({ friends });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
@@ -248,16 +200,8 @@ controller.searchFriends = async (req, res) => {
  */
 controller.getRooms = async (req, res) => {
   try {
-    passport.authenticate('jwt', { session: false }, async (err, user) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      if (!user) {
-        return res.status(401).send({ message: 'Unauthorized' });
-      }
-
-      return res.status(201).send({ message: 'Success', rooms: user.rooms });
-    })(req, res);
+    const user = await PassportAuthUser(req, res);
+    return res.status(201).send({ message: 'Success', rooms: user.rooms });
   } catch (err) {
     logger.error(`Error- ${err}`);
     return res.status(500).send({ message: `Error- ${err}` });
