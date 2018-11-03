@@ -58,7 +58,7 @@ controller.addFriend = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
 
-      const friend = await User.findOne({ email: req.body.email });
+      const friend = await User.findOne({ id: req.body.id });
 
       if (!friend) {
         return res.status(404).send({ message: 'Profile not found' });
@@ -68,7 +68,7 @@ controller.addFriend = async (req, res) => {
         return res.status(409).send({ message: 'You can not add yourself as a friend' });
       }
 
-      const result = user.friends.find(element => element.email === friend.email);
+      const result = user.friends.find(element => element.id === friend.id);
       if (result) return res.status(409).send({ message: 'Already in friends list' });
 
       user.friends.push(friend);
@@ -83,8 +83,8 @@ controller.addFriend = async (req, res) => {
 };
 
 /**
- * Route('/api/users/friends')
- * PUT
+ * Route('/api/users/friends/:id')
+ * DELETE
  * @param {*} req
  * @param {*} res
  */
@@ -98,12 +98,12 @@ controller.removeFriend = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
 
-      const friend = await User.findOne({ email: req.params.id });
+      const friend = await User.findOne({ id: req.params.id });
       if (!friend) {
         return res.status(409).send({ message: 'User does not exist' });
       }
 
-      const userIndex = user.friends.findIndex(element => element.email === friend.email);
+      const userIndex = user.friends.findIndex(element => element.id === friend.id);
       if (userIndex === -1) {
         return res.status(401).send({ message: 'Unauthorized : user not in friends list' });
       }
@@ -159,13 +159,14 @@ controller.getFriendProfile = async (req, res) => {
         return res.status(401).send({ message: 'Unauthorized' });
       }
 
-      const friend = await User.findOne({ email: req.params.id });
+      const friend = await User.findOne({ id: req.params.id });
       if (!friend) {
         return res.status(409).send({ message: 'User does not exist' });
       }
 
       return res.status(200).send({
         message: 'Success',
+        id: friend.id,
         name: friend.name,
         email: friend.email,
         username: friend.username,

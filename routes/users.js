@@ -11,11 +11,12 @@ router.route('/pattern/:id').get(userController.searchUser);
 router
   .route('/friends')
   .get(userController.getFriends)
-  .post(userController.addFriend)
-  .put(userController.removeFriend);
+  .post(userController.addFriend);
 router.route('/rooms').get(userController.getRooms);
-router.route('/friends/:id').get(userController.getFriendProfile);
-router.route('/friends/:id').delete(userController.removeFriend);
+router
+  .route('/friends/:id')
+  .get(userController.getFriendProfile)
+  .delete(userController.removeFriend);
 router.route('/friends/pattern/:id').get(userController.searchFriends);
 
 export default router;

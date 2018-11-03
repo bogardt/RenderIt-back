@@ -41,6 +41,11 @@ const UserSchema = mongoose.Schema(
       enum: ['user', 'admin'],
       default: 'user'
     },
+    id: {
+      type: mongoose.Types.ObjectId,
+      default: new mongoose.Types.ObjectId(),
+      require: true
+    },
     createdAt: { type: Date, default: Date.now }
   },
   { collection: 'User' }

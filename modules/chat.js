@@ -2,7 +2,7 @@ import User from '../models/users';
 import Room from '../models/room';
 import Message from '../models/message';
 
-async function HandleAuthorization(id, socket) {
+async function HandleAuthorization(socket, id) {
   const user = await User.findOne({ email: id });
   if (user) {
     if (user.socket) {
@@ -17,36 +17,36 @@ async function HandleAuthorization(id, socket) {
   socket.emit('error', 'User does not exist');
 }
 
-async function HandleJoinRoom(room, id, socket) {
-  // if (!id) -> create room
-  // if (id) -> join existing room
-  const roomObj = Room.findOne({ name: room });
+async function HandleJoinRoom(socket, room, roomId) {
   const user = User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('error', 'User not authorized');
-  } else if (!roomObj) {
+  } else if (!roomId) {
     const newRoom = new Room();
     newRoom.name = room;
-    newRoom.users.push(user.email);
+    newRoom.users.push(user.id);
     newRoom.history = [];
     await newRoom.save();
 
     user.rooms.push(newRoom);
     await user.save();
-    socket.join(room);
+
+    socket.join(roomId);
     socket.emit('join-room', newRoom);
-  } else {
-    roomObj.users.push(user.email);
+  } else if (roomId) {
+    const roomObj = Room.findOne({ id: roomId });
+    roomObj.users.push(user.id);
     user.rooms.push(roomObj);
     await roomObj.save();
     await user.save();
+
+    socket.join(room);
     socket.emit('join-room', roomObj);
   }
 }
 
-async function HandleMessage(message, room, socket) {
-  // TODO: use room id
-  const roomObj = Room.findOne({ name: room });
+async function HandleMessage(socket, message, room) {
+  const roomObj = Room.findOne({ id: room });
   const user = User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('sentMessage', 'User not authorized');
@@ -66,22 +66,20 @@ async function HandleMessage(message, room, socket) {
   }
 }
 
-async function HandleLeaveRoom(room, id, socket) {
-  // TODO: use room id
-  const roomObj = Room.findOne({ name: room });
+async function HandleLeaveRoom(socket, roomId) {
+  const roomObj = Room.findOne({ id: roomId });
   const user = User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('leave-room', 'User not authorized');
   } else if (!roomObj) {
     socket.emit('leave-room', 'Room does not exist');
   } else {
-    const roomIndex = roomObj.users.indexOf(user.email);
-    // TODO: use room id
-    const userIndex = user.rooms.findIndex(index => index.name === roomObj.name);
+    const roomIndex = roomObj.users.indexOf(user.id);
+    const userIndex = user.rooms.findIndex(index => index.id === roomObj.id);
 
     if (roomIndex === -1) {
       socket.emit('leave-room', 'User not in room');
-    } else if (userIndex === -1) {
+    } else if (!userIndex) {
       socket.emit('leave-room', 'User not in room');
     } else {
       roomObj.users.splice(roomIndex, 1);
@@ -94,25 +92,23 @@ async function HandleLeaveRoom(room, id, socket) {
   }
 }
 
-async function Handletyping(socket, room) {
-  // TODO: use room id
-  const roomObj = Room.findOne({ name: room });
+async function Handletyping(socket, roomId) {
+  const roomObj = Room.findOne({ id: roomId });
   const user = User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('typing', 'User not authorized');
   } else if (!roomObj) {
     socket.emit('typing', 'Room does not exist');
   } else {
-    const roomIndex = roomObj.users.indexOf(user.email);
-    // TODO: use room id
-    const userIndex = user.rooms.findIndex(index => index.name === roomObj.name);
+    const roomIndex = roomObj.users.indexOf(user.id);
+    const userIndex = user.rooms.findIndex(element => element.id === roomObj.id);
 
     if (roomIndex === -1) {
       socket.emit('typing', 'User not in room');
-    } else if (userIndex === -1) {
+    } else if (!userIndex) {
       socket.emit('typing', 'User not in room');
     } else {
-      socket.in(room).emit('typing', room);
+      socket.in(roomId).emit('typing', roomObj);
     }
   }
 }
@@ -130,8 +126,8 @@ module.exports = {
       socket.on('join-room', (room, id) => {
         HandleJoinRoom(socket, room, id);
       });
-      socket.on('leave-room', (room, id) => {
-        HandleLeaveRoom(socket, room, id);
+      socket.on('leave-room', id => {
+        HandleLeaveRoom(socket, id);
       });
       socket.on('message', (message, room) => {
         HandleMessage(socket, message, room);

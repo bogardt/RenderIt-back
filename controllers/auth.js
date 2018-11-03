@@ -57,6 +57,7 @@ controller.me = async (req, res) => {
       return res.status(200).send({
         username: user.username,
         email: user.email,
+        id: user.id,
         role: user.role
       });
     })(req, res);
