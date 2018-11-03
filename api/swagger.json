@@ -11,6 +11,150 @@
   "host": "localhost:4000",
   "basePath": "/api",
   "paths": {
+    "/api/room": {
+      "post": {
+        "operationId": "Create a room",
+        "summary": "Create a room which automaticly link the user",
+        "tags": [
+          "Room"
+        ],
+        "description": "Create a room",
+        "parameters": [
+          {
+            "name": "createroom",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateRoom"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "201": {
+            "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "409": {
+            "description": "Room already exist."
+          }
+        }
+      }
+    },
+    "/api/room/{name}": {
+      "get": {
+        "operationId": "Get a room",
+        "summary": "Get a room",
+        "tags": [
+          "Room"
+        ],
+        "description": "Get a room",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "name of room"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          }
+        }
+      }
+    },
+    "/api/users/rooms": {
+      "get": {
+        "operationId": "Get rooms",
+        "summary": "Get all rooms",
+        "tags": [
+          "Room"
+        ],
+        "description": "Get rooms",
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          }
+        }
+      }
+    },
+    "/api/room/{name}/join": {
+      "put": {
+        "operationId": "Join a room",
+        "summary": "Join a room",
+        "tags": [
+          "Room"
+        ],
+        "description": "Join a room",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "name of room"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          }
+        }
+      }
+    },
+    "/api/room/{name}/leave": {
+      "put": {
+        "operationId": "Leave a room",
+        "summary": "Leave a room",
+        "tags": [
+          "Room"
+        ],
+        "description": "Leave a room",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "name of room"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          }
+        }
+      }
+    },
     "/api/users/friends": {
       "post": {
         "operationId": "Add friend",
@@ -35,6 +179,9 @@
           "201": {
             "description": "Successful request."
           },
+          "401": {
+            "description": "Unauthorized."
+          },
           "409": {
             "description": "Already in friends list."
           }
@@ -53,6 +200,9 @@
           },
           "200": {
             "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
           }
         }
       },
@@ -78,6 +228,9 @@
           },
           "201": {
             "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
           },
           "409": {
             "description": "Already in friends list."
@@ -108,6 +261,9 @@
           },
           "200": {
             "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
           }
         }
       }
@@ -135,11 +291,13 @@
           },
           "200": {
             "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
           }
         }
       }
     },
-    
     "/api/users": {
       "post": {
         "operationId": "register",
@@ -163,6 +321,9 @@
           },
           "201": {
             "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
           },
           "409": {
             "description": "Conflict email already in use."
@@ -193,6 +354,9 @@
           },
           "200": {
             "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
           }
         }
       }
@@ -220,6 +384,9 @@
           },
           "200": {
             "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
           },
           "409": {
             "description": "Conflict email already in use."
@@ -259,6 +426,18 @@
     }
   },
   "definitions": {
+    "CreateRoom": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "newroom"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
     "AddFriend": {
       "type": "object",
       "properties": {
