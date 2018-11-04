@@ -23,13 +23,21 @@ async function HandleJoinRoom(socket, roomId) {
     if (!roomObj) {
       socket.emit('fail', 'Room does not exist');
     } else {
-      roomObj.users.push(user.id);
-      user.rooms.push(roomObj);
-      await roomObj.save();
-      await user.save();
+      const roomIndex = roomObj.users.findIndex(element => element.equals(user.id));
+      const userIndex = user.rooms.findIndex(element => element.id.equals(roomObj.id));
+      if (!roomIndex) {
+        socket.emit('fail', 'User already in room');
+      } else if (!userIndex) {
+        socket.emit('fail', 'User already in room');
+      } else {
+        roomObj.users.push(user.id);
+        user.rooms.push(roomObj);
+        await roomObj.save();
+        await user.save();
 
-      socket.join(roomId);
-      socket.emit('join-room', roomObj);
+        socket.join(roomId);
+        socket.emit('join-room', roomObj);
+      }
     }
   }
 }
@@ -47,16 +55,24 @@ async function HandleAddFriend(io, socket, userId, roomId) {
     if (!roomObj) {
       socket.emit('fail', 'Room does not exist');
     } else {
-      roomObj.users.push(friend.id);
-      friend.rooms.push(roomObj);
-      await roomObj.save();
-      await friend.save();
+      const roomIndex = roomObj.users.findIndex(element => element.equals(friend.id));
+      const userIndex = friend.rooms.findIndex(element => element.id.equals(roomObj.id));
+      if (!roomIndex) {
+        socket.emit('fail', 'User already in room');
+      } else if (!userIndex) {
+        socket.emit('fail', 'User already in room');
+      } else {
+        roomObj.users.push(friend.id);
+        friend.rooms.push(roomObj);
+        await roomObj.save();
+        await friend.save();
 
-      if (friendSocket) {
-        friendSocket.join(roomId);
+        if (friendSocket) {
+          friendSocket.join(roomId);
+        }
+
+        socket.emit('add-friend', roomObj);
       }
-
-      socket.emit('add-friend', roomObj);
     }
   }
 }
