@@ -53,33 +53,11 @@ controller.deleteRoom = async (req, res) => {
  */
 controller.getRoom = async (req, res) => {
   try {
-    const user = await PassportAuthUser(req, res);
+    await PassportAuthUser(req, res);
 
     const room = await Room.findOne({ id: req.params.id });
     if (!room) {
       return res.status(409).send({ message: 'Room does not exist' });
-    }
-
-    const roomIndex = room.users.findIndex(element => element.equals(user.id));
-    const userIndex = user.rooms.findIndex(element => element.id.equals(room.id));
-    if (!roomIndex) {
-      return res.status(200).send({
-        message: 'Not in room',
-        name: room.name,
-        id: room.id,
-        history: [],
-        users: room.users
-      });
-    }
-
-    if (!userIndex) {
-      return res.status(200).send({
-        message: 'Not in room',
-        name: room.name,
-        id: room.id,
-        history: [],
-        users: room.users
-      });
     }
 
     return res.status(200).send({
