@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "guid": "0.0.12"
+    "guid": "0.0.12",
+    "sync-request": "^6.0.0"
   }
 }

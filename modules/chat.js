@@ -5,14 +5,10 @@ import Message from '../models/message';
 async function HandleAuthorization(socket, id) {
   const user = await User.findOne({ email: id });
   if (user) {
-    if (user.socket) {
-      socket.emit('fail', 'User already authorized');
-    } else {
-      user.socket = socket.id;
-      await user.save();
-      // TODO : join all connected rooms
-      socket.emit('success', 'User successfully authorized');
-    }
+    user.socket = socket.id;
+    await user.save();
+    // TODO : join all connected rooms
+    socket.emit('success', 'User successfully authorized');
   } else {
     socket.emit('fail', 'User does not exist');
   }
