@@ -13,9 +13,7 @@ const options = {
 
 module.exports = new JwtStrategy(options, (jwtPayload, cb) => {
   User.findOne({ email: jwtPayload.email })
-    .then(user => {
-      return cb(null, user);
-    })
+    .then(user => cb(null, user))
     .catch(err => {
       console.log(err);
       return cb(err);
