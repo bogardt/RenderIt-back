@@ -96,6 +96,31 @@ controller.getRoom = async (req, res) => {
 };
 
 /**
+ * Route('/api/room')
+ * GET
+ * @param {*} req
+ * @param {*} res
+ */
+controller.getRooms = async (req, res) => {
+  try {
+    const user = await PassportAuthUser(req, res);
+
+    const room = await Room.find();
+    if (!room) {
+      return res.status(409).send({ message: 'Room does not exist' });
+    }
+
+    return res.status(200).send({
+      message: 'Success',
+      rooms: room
+    });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
+};
+
+/**
  * Route('/api/room/:id/leave')
  * PUT
  * @param {*} req

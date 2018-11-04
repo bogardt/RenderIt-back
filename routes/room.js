@@ -3,7 +3,10 @@ import roomController from '../controllers/room';
 
 const router = express.Router();
 
-router.route('/').post(roomController.createRoom);
+router
+  .route('/')
+  .post(roomController.createRoom)
+  .get(roomController.getRooms);
 router
   .route('/:id')
   .get(roomController.getRoom)
