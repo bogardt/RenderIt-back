@@ -7,7 +7,9 @@ async function HandleAuthorization(socket, id) {
   if (user) {
     user.socket = socket.id;
     await user.save();
-    // TODO : join all connected rooms
+    user.rooms.forEach(element => {
+      socket.join(element.id);
+    });
     socket.emit('success', 'User successfully authorized');
   } else {
     socket.emit('fail', 'User does not exist');
