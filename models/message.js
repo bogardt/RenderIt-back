@@ -6,7 +6,7 @@ const MessageSchema = mongoose.Schema({
     require: true
   },
   from: {
-    type: [],
+    type: String,
     require: true
   },
   to: {

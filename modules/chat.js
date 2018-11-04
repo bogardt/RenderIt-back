@@ -92,13 +92,14 @@ async function HandleMessage(io, socket, message, room) {
     socket.emit('fail', 'Room does not exist');
   } else {
     const newMessage = new Message();
-    newMessage.from.push(user);
+    newMessage.from = user.email;
     newMessage.to = room;
     newMessage.message = message;
     newMessage.date = Date.now();
-
     roomObj.history.push(newMessage);
-    roomObj.save();
+    console.log('message: ')
+    console.log(roomObj)
+    await roomObj.save();
 
     io.in(room).emit('stop-typing', roomObj);
     io.in(room).emit('message', roomObj.history);
