@@ -95,6 +95,36 @@
         }
       }
     },
+    "/api/users/rooms/pattern/{text}": {
+      "get": {
+        "operationId": "Get rooms by searching text",
+        "summary": "Get all rooms by searching text",
+        "tags": [
+          "Room"
+        ],
+        "description": "Get rooms",
+        "parameters": [
+          {
+            "name": "text",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "name of room"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Invalid request."
+          },
+          "200": {
+            "description": "Successful request."
+          },
+          "401": {
+            "description": "Unauthorized."
+          }
+        }
+      }
+    },
     "/api/room/{name}/join": {
       "put": {
         "operationId": "Join a room",

@@ -208,4 +208,27 @@ controller.getRooms = async (req, res) => {
   }
 };
 
+/**
+ * Route('/api/users/rooms/pattern/:id')
+ * GET
+ * @param {*} req
+ * @param {*} res
+ */
+controller.searchRooms = async (req, res) => {
+  try {
+    const user = await PassportAuthUser(req, res);
+    const regex = new RegExp(`^${req.params.id}`, 'i');
+    const rooms = [];
+    for (let i = 0; i < user.rooms.length; i += 1) {
+      if (user.rooms[i].name.match(regex)) {
+        rooms.push(user.rooms[i]);
+      }
+    }
+    return res.status(200).send({ rooms });
+  } catch (err) {
+    logger.error(`Error- ${err}`);
+    return res.status(500).send({ message: `Error- ${err}` });
+  }
+};
+
 export default controller;

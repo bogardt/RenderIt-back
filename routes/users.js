@@ -13,6 +13,7 @@ router
   .get(userController.getFriends)
   .post(userController.addFriend);
 router.route('/rooms').get(userController.getRooms);
+router.route('/rooms/pattern/:id').get(userController.searchRooms);
 router
   .route('/friends/:id')
   .get(userController.getFriendProfile)
