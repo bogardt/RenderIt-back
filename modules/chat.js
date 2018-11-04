@@ -116,7 +116,7 @@ async function HandleMessage(io, socket, message, room) {
     await roomObj.save();
 
     io.in(room).emit('stop-typing', roomObj);
-    io.in(room).emit('message', room);
+    io.in(room.toString()).emit('room-response', room.toString());
     socket.emit('message', room);
   }
 }
