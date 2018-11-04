@@ -157,9 +157,15 @@ controller.searchUser = async (req, res) => {
     const users = await User.find({ email: { $regex: req.params.id, $options: 'i' } });
     const tmp = [];
     for (let i = 0; i < users.length; i += 1) {
+      let isFriend = false;
+      for (let j = 0; j < user.friends.length; j += 1) {
+        if (user.friends[j].email === users[i].email) {
+          isFriend = true;
+        }
+      }
       tmp[i] = {
         email: users[i].email,
-        friend: user.friends.indexOf(users[i].email) !== -1,
+        friend: isFriend,
         id: users[i].id
       };
     }

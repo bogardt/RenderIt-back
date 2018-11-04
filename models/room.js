@@ -14,9 +14,10 @@ const RoomSchema = mongoose.Schema({
     require: false
   },
   id: {
-    type: mongoose.Types.ObjectId,
-    default: new mongoose.Types.ObjectId(),
-    require: true
+    type: mongoose.Schema.Types.ObjectId,
+    index: true,
+    required: true,
+    auto: true
   }
 });
 const Room = mongoose.model('Room', RoomSchema);

@@ -42,9 +42,10 @@ const UserSchema = mongoose.Schema(
       default: 'user'
     },
     id: {
-      type: mongoose.Types.ObjectId,
-      default: new mongoose.Types.ObjectId(),
-      require: true
+      type: mongoose.Schema.Types.ObjectId,
+      index: true,
+      required: true,
+      auto: true
     },
     createdAt: { type: Date, default: Date.now }
   },
