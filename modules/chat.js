@@ -75,7 +75,7 @@ async function HandleCreateRoom(socket, name) {
     newRoom.history = [];
     await newRoom.save();
 
-    user.rooms = [newRoom];
+    user.rooms = [...user.rooms, newRoom];
     await user.save();
 
     socket.join(newRoom.id);
