@@ -97,12 +97,11 @@ async function HandleMessage(io, socket, message, room) {
     newMessage.message = message;
     newMessage.date = Date.now();
     roomObj.history.push(newMessage);
-    console.log('message: ')
-    console.log(roomObj)
     await roomObj.save();
 
     io.in(room).emit('stop-typing', roomObj);
     io.in(room).emit('message', roomObj.history);
+    socket.emit('message', room);
   }
 }
 

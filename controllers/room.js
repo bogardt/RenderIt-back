@@ -87,7 +87,6 @@ controller.getRooms = async (req, res) => {
     if (!room) {
       return res.status(409).send({ message: 'Room does not exist' });
     }
-
     return res.status(200).send({
       message: 'Success',
       rooms: room
