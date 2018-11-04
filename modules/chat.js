@@ -19,11 +19,11 @@ async function HandleAuthorization(socket, id) {
 }
 
 async function HandleJoinRoom(socket, roomId) {
-  const user = User.findOne({ socket: socket.id });
+  const user = await User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('fail', 'User not authorized');
   } else {
-    const roomObj = Room.findOne({ id: roomId });
+    const roomObj = await Room.findOne({ id: roomId });
     if (!roomObj) {
       socket.emit('fail', 'Room does not exist');
     } else {
@@ -39,15 +39,15 @@ async function HandleJoinRoom(socket, roomId) {
 }
 
 async function HandleAddFriend(io, socket, userId, roomId) {
-  const user = User.findOne({ socket: socket.id });
-  const friend = User.findOne({ id: userId });
+  const user = await User.findOne({ socket: socket.id });
+  const friend = await User.findOne({ id: userId });
   const friendSocket = io.sockets.connected[friend.socket];
   if (!user) {
     socket.emit('fail', 'User not authorized');
   } else if (!friend) {
     socket.emit('fail', 'User does not exist');
   } else {
-    const roomObj = Room.findOne({ id: roomId });
+    const roomObj = await Room.findOne({ id: roomId });
     if (!roomObj) {
       socket.emit('fail', 'Room does not exist');
     } else {
@@ -66,17 +66,20 @@ async function HandleAddFriend(io, socket, userId, roomId) {
 }
 
 async function HandleCreateRoom(socket, name) {
-  const user = User.findOne({ socket: socket.id });
+  const user = await User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('fail', 'User not authorized');
   } else {
+    console.log(user);
+    console.log(socket.id);
+    console.log(typeof socket.id);
     const newRoom = new Room();
     newRoom.name = name;
     newRoom.users.push(user.id);
     newRoom.history = [];
     await newRoom.save();
 
-    user.rooms.push(newRoom);
+    user.rooms = [newRoom];
     await user.save();
 
     socket.join(newRoom.id);
@@ -85,8 +88,8 @@ async function HandleCreateRoom(socket, name) {
 }
 
 async function HandleMessage(io, socket, message, room) {
-  const roomObj = Room.findOne({ id: room });
-  const user = User.findOne({ socket: socket.id });
+  const roomObj = await Room.findOne({ id: room });
+  const user = await User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('fail', 'User not authorized');
   } else if (!roomObj) {
@@ -107,8 +110,8 @@ async function HandleMessage(io, socket, message, room) {
 }
 
 async function HandleLeaveRoom(socket, roomId) {
-  const roomObj = Room.findOne({ id: roomId });
-  const user = User.findOne({ socket: socket.id });
+  const roomObj = await Room.findOne({ id: roomId });
+  const user = await User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('leave-room', 'User not authorized');
   } else if (!roomObj) {
@@ -133,8 +136,8 @@ async function HandleLeaveRoom(socket, roomId) {
 }
 
 async function Handletyping(io, socket, roomId) {
-  const roomObj = Room.findOne({ id: roomId });
-  const user = User.findOne({ socket: socket.id });
+  const roomObj = await Room.findOne({ id: roomId });
+  const user = await User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('fail', 'User not authorized');
   } else if (!roomObj) {
@@ -154,8 +157,8 @@ async function Handletyping(io, socket, roomId) {
 }
 
 async function HandleStoptyping(io, socket, roomId) {
-  const roomObj = Room.findOne({ id: roomId });
-  const user = User.findOne({ socket: socket.id });
+  const roomObj = await Room.findOne({ id: roomId });
+  const user = await User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('fail', 'User not authorized');
   } else if (!roomObj) {
