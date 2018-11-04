@@ -3,60 +3,62 @@ import Room from '../models/room';
 import Message from '../models/message';
 
 async function HandleAuthorization(socket, id) {
+  console.log('----------------id---------------------');
+  console.log(id);
   const user = await User.findOne({ email: id });
   if (user) {
     if (user.socket) {
-      socket.emit('error', 'User already authorized');
-      return;
+      await socket.emit('error', 'User already authorized');
+      console.log('ERROR');
+    } else {
+      user.socket = socket.id;
+      await user.save();
+      socket.emit('success', 'User successfully authorized');
+      console.log('SUCCESS');
     }
-    user.socket = socket.id;
-    await user.save();
-    socket.emit('success', 'User successfully authorized');
-    return;
+  } else {
+    console.log('ERROR2');
+    await socket.emit('error', 'User does not exist');
   }
-  socket.emit('error', 'User does not exist');
 }
 
 async function HandleJoinRoom(socket, roomId) {
   const user = User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('error', 'User not authorized');
-    return;
+  } else {
+    const roomObj = Room.findOne({ id: roomId });
+    if (!roomObj) {
+      socket.emit('error', 'Room does not exist');
+    } else {
+      roomObj.users.push(user.id);
+      user.rooms.push(roomObj);
+      await roomObj.save();
+      await user.save();
+
+      socket.join(roomId);
+      socket.emit('join-room', roomObj);
+    }
   }
-
-  const roomObj = Room.findOne({ id: roomId });
-  if (!roomObj) {
-    socket.emit('error', 'Room does not exist');
-    return;
-  }
-
-  roomObj.users.push(user.id);
-  user.rooms.push(roomObj);
-  await roomObj.save();
-  await user.save();
-
-  socket.join(roomId);
-  socket.emit('join-room', roomObj);
 }
 
 async function HandleCreateRoom(socket, name) {
   const user = User.findOne({ socket: socket.id });
   if (!user) {
     socket.emit('error', 'User not authorized');
-    return;
+  } else {
+    const newRoom = new Room();
+    newRoom.name = name;
+    newRoom.users.push(user.id);
+    newRoom.history = [];
+    await newRoom.save();
+
+    user.rooms.push(newRoom);
+    await user.save();
+
+    socket.join(newRoom.id);
+    socket.emit('create-room', newRoom);
   }
-
-  const newRoom = new Room();
-  newRoom.name = name;
-  newRoom.users.push(user.id);
-  newRoom.history = [];
-  await newRoom.save();
-
-  user.rooms.push(newRoom);
-  await user.save();
-
-  socket.join(newRoom.id);
-  socket.emit('create-room', newRoom);
 }
 
 async function HandleMessage(io, socket, message, room) {
@@ -151,7 +153,7 @@ async function HandleStoptyping(io, socket, roomId) {
 
 async function HandleDisconnect(socket) {
   const user = User.findOne({ socket: socket.id });
-  if (user) {
+  if (user && user.socket === socket.id) {
     user.socket = null;
     await user.save();
   }
@@ -165,7 +167,7 @@ module.exports = {
     io.on('connection', socket => {
       socket.emit('authorization', 'email requested');
       socket.on('authorization', async id => {
-        HandleAuthorization(socket, id);
+        await HandleAuthorization(socket, id);
       });
       socket.on('join-room', id => {
         HandleJoinRoom(socket, id);

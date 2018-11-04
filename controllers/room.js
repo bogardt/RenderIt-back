@@ -103,7 +103,7 @@ controller.getRoom = async (req, res) => {
  */
 controller.getRooms = async (req, res) => {
   try {
-    const user = await PassportAuthUser(req, res);
+    await PassportAuthUser(req, res);
 
     const room = await Room.find();
     if (!room) {
