@@ -76,6 +76,7 @@ async function HandleMessage(io, socket, message, room) {
     roomObj.history.push(newMessage);
     roomObj.save();
 
+    io.in(room).emit('stop-typing', roomObj);
     io.in(room).emit('message', roomObj.history);
   }
 }
