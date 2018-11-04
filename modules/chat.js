@@ -195,7 +195,7 @@ module.exports = {
         HandleJoinRoom(socket, id);
       });
       socket.on('add-friend', (userId, roomId) => {
-        HandleAddFriend(socket, userId, roomId);
+        HandleAddFriend(io, socket, userId, roomId);
       });
       socket.on('create-room', name => {
         HandleCreateRoom(socket, name);
