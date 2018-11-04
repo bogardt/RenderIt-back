@@ -1,4 +1,5 @@
 import * as winston from 'winston';
+import * as rotate from 'winston-daily-rotate-file';
 import * as fs from 'fs';
 import config from '../config.dev';
 
