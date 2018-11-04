@@ -56,7 +56,7 @@ controller.addFriend = async (req, res) => {
       return res.status(409).send({ message: 'You can not add yourself as a friend' });
     }
 
-    const result = user.friends.find(element => element.id === friend.id);
+    const result = user.friends.find(element => element.id.equals(friend.id));
     if (result) return res.status(409).send({ message: 'Already in friends list' });
 
     user.friends.push(friend);
@@ -84,8 +84,8 @@ controller.removeFriend = async (req, res) => {
       return res.status(409).send({ message: 'User does not exist' });
     }
 
-    const userIndex = user.friends.findIndex(element => element.id === friend.id);
-    if (userIndex === -1) {
+    const userIndex = user.friends.findIndex(element => element.id.equals(friend.id));
+    if (!userIndex) {
       return res.status(401).send({ message: 'Unauthorized : user not in friends list' });
     }
 
@@ -159,7 +159,8 @@ controller.searchUser = async (req, res) => {
     for (let i = 0; i < users.length; i += 1) {
       tmp[i] = {
         email: users[i].email,
-        friend: user.friends.indexOf(users[i].email) !== -1
+        friend: user.friends.indexOf(users[i].email) !== -1,
+        id: users[i].id
       };
     }
     return res.status(200).send({ users: tmp });
@@ -181,7 +182,7 @@ controller.searchFriends = async (req, res) => {
     const regex = new RegExp(`^${req.params.id}`, 'i');
     const friends = [];
     for (let i = 0; i < user.friends.length; i += 1) {
-      if (user.friends[i].match(regex)) {
+      if (user.friends[i].email.match(regex)) {
         friends.push(user.friends[i]);
       }
     }

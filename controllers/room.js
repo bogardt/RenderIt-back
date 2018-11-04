@@ -60,9 +60,9 @@ controller.getRoom = async (req, res) => {
       return res.status(409).send({ message: 'Room does not exist' });
     }
 
-    const roomIndex = room.users.indexOf(user.id);
-    const userIndex = user.rooms.findIndex(element => element.id === room.id);
-    if (roomIndex === -1) {
+    const roomIndex = room.users.findIndex(element => element.equals(user.id));
+    const userIndex = user.rooms.findIndex(element => element.id.equals(room.id));
+    if (!roomIndex) {
       return res.status(200).send({
         message: 'Not in room',
         name: room.name,
@@ -135,9 +135,9 @@ controller.leaveRoom = async (req, res) => {
       return res.status(409).send({ message: 'Room does not exist' });
     }
 
-    const roomIndex = room.users.indexOf(user.id);
-    const userIndex = user.rooms.findIndex(element => element.id === room.id);
-    if (roomIndex === -1) {
+    const roomIndex = room.users.findIndex(element => element.equals(user.id));
+    const userIndex = user.rooms.findIndex(element => element.id.equals(room.id));
+    if (!roomIndex) {
       return res.status(401).send({ message: 'Unauthorized : user not in room' });
     }
     if (!userIndex) {
@@ -176,8 +176,8 @@ controller.joinRoom = async (req, res) => {
       return res.status(409).send({ message: 'Room does not exist' });
     }
 
-    const roomIndex = room.users.indexOf(user.id);
-    if (roomIndex !== -1) {
+    const roomIndex = room.users.findIndex(element => element.equals(user.id));
+    if (!roomIndex) {
       return res.status(409).send({ message: 'User already registered in room' });
     }
 
